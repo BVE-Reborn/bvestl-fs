@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 #endif
 	path path2("dir 3");
 
-	cout << path1.exists() << endl;
+	cout << path1.file_exists() << endl;
 	cout << path1 << endl;
 	cout << (path1 / path2) << endl;
 	cout << (path1 / path2).parent_path() << endl;
@@ -24,18 +24,18 @@ int main(int argc, char** argv) {
 	cout << "some/path.ext:operator==() = " << (path("some/path.ext") == path("some/path.ext")) << endl;
 	cout << "some/path.ext:operator==() (unequal) = " << (path("some/path.ext") == path("another/path.ext")) << endl;
 
-	cout << "nonexistant:exists = " << path("nonexistant").exists() << endl;
+	cout << "nonexistant:file_exists = " << path("nonexistant").file_exists() << endl;
 	cout << "nonexistant:is_file = " << path("nonexistant").is_file() << endl;
 	cout << "nonexistant:is_directory = " << path("nonexistant").is_directory() << endl;
 	cout << "nonexistant:filename = " << path("nonexistant").filename() << endl;
 	cout << "nonexistant:extension = " << path("nonexistant").extension() << endl;
-	//	cout << "include/fs/path.hpp:exists = " << path("include/fs/path.hpp").exists() << endl;
+	//	cout << "include/fs/path.hpp:exists = " << path("include/fs/path.hpp").file_exists() << endl;
 	//	cout << "include/fs/path.hpp:is_file = " << path("include/fs/path.hpp").is_file() << endl;
 	//	cout << "include/fs/path.hpp:is_directory = " << path("include/fs/path.hpp").is_directory() << endl;
 	//	cout << "include/fs/path.hpp:filename = " << path("include/fs/path.hpp").filename() << endl;
 	//	cout << "include/fs/path.hpp:extension = " << path("include/fs/path.hpp").extension() << endl;
 	//	cout << "include/fs/path.hpp:make_absolute = " << path("include/fs/path.hpp").make_absolute() << endl;
-	cout << "../include/fs:exists = " << path("../include/fs").exists() << endl;
+	cout << "../include/fs:file_exists = " << path("../include/fs").file_exists() << endl;
 	cout << "../include/fs:is_file = " << path("../include/fs").is_file() << endl;
 	cout << "../include/fs:is_directory = " << path("../include/fs").is_directory() << endl;
 	cout << "../include/fs:extension = " << path("../include/fs").extension() << endl;

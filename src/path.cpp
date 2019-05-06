@@ -13,6 +13,10 @@
 #	include <linux/limits.h>
 #endif
 
+#include <cstring>
+#include <stdexcept>
+#include <sstream>
+
 fs::path fs::path::make_absolute() const {
 #if !defined(_WIN32)
 	char temp[PATH_MAX];
@@ -28,7 +32,7 @@ fs::path fs::path::make_absolute() const {
 #endif
 }
 
-bool fs::path::exists() const {
+bool fs::path::file_exists() const {
 #if defined(_WIN32)
 	return GetFileAttributesW(wstr().c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
@@ -125,7 +129,7 @@ std::string fs::path::str(fs::path::path_type type) const {
 	std::ostringstream oss;
 
 	if (m_absolute) {
-		if (m_type == posix_path)
+		if (m_type == path_type::posix_path)
 			oss << "/";
 		else {
 			size_t length = 0;
@@ -144,7 +148,7 @@ std::string fs::path::str(fs::path::path_type type) const {
 	for (size_t i = 0; i < m_path.size(); ++i) {
 		oss << m_path[i];
 		if (i + 1 < m_path.size()) {
-			if (type == posix_path)
+			if (type == path_type::posix_path)
 				oss << '/';
 			else
 				oss << '\\';
@@ -156,7 +160,7 @@ std::string fs::path::str(fs::path::path_type type) const {
 
 void fs::path::set(const std::string& str, fs::path::path_type type) {
 	m_type = type;
-	if (type == windows_path) {
+	if (type == path_type::windows_path) {
 		std::string tmp = str;
 
 		// Long windows paths (sometimes) begin with the prefix \\?\. It should only
@@ -209,17 +213,17 @@ bool fs::create_directories(fs::path const& p) {
 #endif
 }
 
-bool fs::path::remove_file() {
+bool fs::remove_file(const path& p) {
 #if !defined(_WIN32)
-	return std::remove(str().c_str()) == 0;
+	return std::remove(p.str().c_str()) == 0;
 #else
 	return DeleteFileW(wstr().c_str()) != 0;
 #endif
 }
 
-bool fs::path::resize_file(size_t target_length) {
+bool fs::resize_file(const path& p, size_t target_length) {
 #if !defined(_WIN32)
-	return ::truncate(str().c_str(), (off_t) target_length) == 0;
+	return ::truncate(p.str().c_str(), (off_t) target_length) == 0;
 #else
 	HANDLE handle = CreateFileW(wstr().c_str(), GENERIC_WRITE, 0, nullptr, 0, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (handle == INVALID_HANDLE_VALUE)
@@ -239,7 +243,7 @@ bool fs::path::resize_file(size_t target_length) {
 #endif
 }
 
-fs::path fs::path::getcwd() {
+fs::path fs::getcwd() {
 #if !defined(_WIN32)
 	char temp[PATH_MAX];
 	if (::getcwd(temp, PATH_MAX) == NULL)
