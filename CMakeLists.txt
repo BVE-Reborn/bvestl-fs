@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-project(fs LANGUAGES CXX)
+project(libfs LANGUAGES CXX)
 
 include(GenerateExportHeader)
 include(GNUInstallDirs)
@@ -25,7 +25,7 @@ target_link_libraries(fs PUBLIC eastl::polyalloc)
 
 generate_export_header(
         fs
-        BASE_NAME FS
+        BASE_NAME LIBFS
         EXPORT_FILE_NAME include/fs/api.hpp
 )
 target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)

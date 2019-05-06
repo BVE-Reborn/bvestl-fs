@@ -9,7 +9,8 @@
 
 #pragma once
 
-#include "path.hpp"
+#include "fs/allocation.hpp"
+#include "fs/path.hpp"
 
 namespace fs {
 
@@ -20,7 +21,7 @@ namespace fs {
 	 * and a set of search paths. The implementation walks through the
 	 * search paths in order and stops once the file is found.
 	 */
-	class FS_EXPORT resolver {
+	class LIBFS_EXPORT resolver {
 	  public:
 		typedef std::vector<path>::iterator iterator;
 		typedef std::vector<path>::const_iterator const_iterator;
@@ -66,7 +67,7 @@ namespace fs {
 
 		path resolve(const path& value) const;
 
-		FS_EXPORT friend std::ostream& operator<<(std::ostream& os, const resolver& r);
+		LIBFS_EXPORT friend std::ostream& operator<<(std::ostream& os, const resolver& r);
 
 	  private:
 		std::vector<path> m_paths;

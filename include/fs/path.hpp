@@ -30,7 +30,7 @@ namespace fs {
 	 * dependency until boost::filesystem is integrated into the standard template
 	 * library at some point in the future.
 	 */
-	class FS_EXPORT path {
+	class LIBFS_EXPORT path {
 	  public:
 		enum path_type {
 			windows_path = 0,
@@ -111,7 +111,7 @@ namespace fs {
 		void set(const std::wstring& wstring, path_type type = native_path);
 #endif
 
-		FS_EXPORT friend std::ostream& operator<<(std::ostream& os, const path& path);
+		LIBFS_EXPORT friend std::ostream& operator<<(std::ostream& os, const path& path);
 
 		bool remove_file();
 
@@ -139,8 +139,8 @@ namespace fs {
 		bool m_absolute;
 	};
 
-	FS_EXPORT inline bool create_directory(const path& p);
+	LIBFS_EXPORT inline bool create_directory(const path& p);
 
-	FS_EXPORT inline bool create_directories(const path& p);
+	LIBFS_EXPORT inline bool create_directories(const path& p);
 
 } // namespace fs

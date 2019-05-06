@@ -254,19 +254,19 @@ fs::path fs::path::getcwd() {
 }
 
 std::vector<std::string> fs::path::tokenize(const std::string& string, const std::string& delim) {
-    std::string::size_type lastPos = 0, pos = string.find_first_of(delim, lastPos);
-    std::vector<std::string> tokens;
+	std::string::size_type lastPos = 0, pos = string.find_first_of(delim, lastPos);
+	std::vector<std::string> tokens;
 
-    while (lastPos != std::string::npos) {
-        if (pos != lastPos)
-            tokens.push_back(string.substr(lastPos, pos - lastPos));
-        lastPos = pos;
-        if (lastPos == std::string::npos || lastPos + 1 == string.length())
-            break;
-        pos = string.find_first_of(delim, ++lastPos);
-    }
+	while (lastPos != std::string::npos) {
+		if (pos != lastPos)
+			tokens.push_back(string.substr(lastPos, pos - lastPos));
+		lastPos = pos;
+		if (lastPos == std::string::npos || lastPos + 1 == string.length())
+			break;
+		pos = string.find_first_of(delim, ++lastPos);
+	}
 
-    return tokens;
+	return tokens;
 }
 
 #if defined(_WIN32)
