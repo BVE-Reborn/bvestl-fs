@@ -271,7 +271,7 @@ fs::internal::vector<fs::internal::string> fs::path::tokenize(const fs::internal
 
 	while (lastPos != internal::string::npos) {
 		if (pos != lastPos) {
-			tokens.push_back(internal::substr(string, lastPos, eastl::min(string.size(), pos - lastPos), handle));
+			tokens.push_back(internal::substr(string, lastPos, eastl::min(string.size() - lastPos, pos - lastPos), handle));
 		}
 		lastPos = pos;
 		if (lastPos == std::string::npos || lastPos + 1 == string.length())
