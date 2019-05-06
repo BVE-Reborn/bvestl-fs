@@ -28,7 +28,7 @@ namespace fs {
 		using const_iterator = eastl::vector<path, eastl::polyalloc::allocator_handle>::const_iterator;
 
 		explicit resolver(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) : m_paths(handle) {
-			m_paths.push_back(getcwd());
+			m_paths.push_back(cwd());
 		}
 
 		size_t size() const { return m_paths.size(); }
@@ -48,10 +48,12 @@ namespace fs {
 
 		path resolve(const path& value) const;
 
-		LIBFS_EXPORT friend std::ostream& operator<<(std::ostream& os, const resolver& r);
+		friend std::ostream& operator<<(std::ostream&, const resolver&);
 
 	  private:
 		eastl::vector<path, eastl::polyalloc::allocator_handle> m_paths;
 	};
+
+	LIBFS_EXPORT std::ostream& operator<<(std::ostream& os, const resolver& r);
 
 } // namespace fs

@@ -14,8 +14,8 @@
 #endif
 
 #include <cstring>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 fs::path fs::path::make_absolute() const {
 #if !defined(_WIN32)
@@ -82,7 +82,7 @@ bool fs::path::is_file() const {
 
 std::string fs::path::extension() const {
 	const std::string& name = filename();
-	size_t pos = name.find_last_of(".");
+	size_t pos = name.find_last_of('.');
 	if (pos == std::string::npos)
 		return "";
 	return name.substr(pos + 1);
@@ -101,7 +101,7 @@ fs::path fs::path::parent_path() const {
 
 	if (m_path.empty()) {
 		if (!m_absolute)
-			result.m_path.push_back("..");
+			result.m_path.emplace_back("..");
 	}
 	else {
 		size_t until = m_path.size() - 1;
@@ -119,8 +119,9 @@ fs::path fs::path::operator/(fs::path const& other) const {
 
 	path result(*this);
 
-	for (size_t i = 0; i < other.m_path.size(); ++i)
-		result.m_path.push_back(other.m_path[i]);
+	for (const auto& i : other.m_path) {
+		result.m_path.push_back(i);
+	}
 
 	return result;
 }
@@ -243,7 +244,7 @@ bool fs::resize_file(const path& p, size_t target_length) {
 #endif
 }
 
-fs::path fs::getcwd() {
+fs::path fs::cwd() {
 #if !defined(_WIN32)
 	char temp[PATH_MAX];
 	if (::getcwd(temp, PATH_MAX) == NULL)

@@ -48,8 +48,8 @@ namespace fs {
 		explicit path(const std::string& string) { set(string); }
 
 #if defined(EA_PLATFORM_WINDOWS)
-        // Windows Constructors impl
-        path(const wchar_t* wstring) { set(wstring); }
+		// Windows Constructors impl
+		path(const wchar_t* wstring) { set(wstring); }
 		path(const std::wstring& wstring) { set(wstring); }
 
 		path& operator=(const std::wstring& str) {
@@ -58,60 +58,59 @@ namespace fs {
 		}
 #endif
 
-        // Internal set-from string functions
-        void set(const std::string& str, path_type type = path_type::native_path);
+		// Internal set-from string functions
+		void set(const std::string& str, path_type type = path_type::native_path);
 #if defined(EA_PLATFORM_WINDOWS)
-        void set(const std::wstring& wstring, path_type type = native_path);
+		void set(const std::wstring& wstring, path_type type = native_path);
 #endif
 
-        std::string str(path_type type = path_type::native_path) const;
+		std::string str(path_type type = path_type::native_path) const;
 #if defined(EA_PLATFORM_WINDOWS)
-        std::wstring wstr(path_type type = native_path) const;
+		std::wstring wstr(path_type type = native_path) const;
 #endif
 
-        bool empty() const { return m_path.empty(); }
+		bool empty() const { return m_path.empty(); }
 		size_t length() const { return m_path.size(); }
-        std::string filename() const;
-        std::string extension() const;
+		std::string filename() const;
+		std::string extension() const;
 
-        size_t file_size() const;
-        bool file_exists() const;
+		size_t file_size() const;
+		bool file_exists() const;
 
 		bool is_absolute() const { return m_absolute; }
-        bool is_directory() const;
-        bool is_file() const;
+		bool is_directory() const;
+		bool is_file() const;
 
 		path make_absolute() const;
-        path parent_path() const;
+		path parent_path() const;
 
-        // Comparison Operators
-        bool operator==(const path& p) const { return p.m_path == m_path; }
-        bool operator!=(const path& p) const { return p.m_path != m_path; }
+		// Comparison Operators
+		bool operator==(const path& p) const { return p.m_path == m_path; }
+		bool operator!=(const path& p) const { return p.m_path != m_path; }
 
-        // Modification Operators
-        path operator/(const path& other) const;
+		// Modification Operators
+		path operator/(const path& other) const;
 
 	  protected:
 		static std::vector<std::string> tokenize(const std::string& string, const std::string& delim);
 #if defined(EA_PLATFORM_WINDOWS)
 		static const size_t MAX_PATH_WINDOWS = 32767;
 #endif
-        static const size_t MAX_PATH_WINDOWS_LEGACY = 260;
-        std::vector<std::string> m_path;
-        path_type m_type;
-        bool m_absolute;
+		static const size_t MAX_PATH_WINDOWS_LEGACY = 260;
+		std::vector<std::string> m_path;
+		path_type m_type;
+		bool m_absolute;
 	};
 
-    // Utility
-    LIBFS_EXPORT path getcwd();
+	// Utility
+	LIBFS_EXPORT path cwd();
 
 	LIBFS_EXPORT bool create_directory(const path& p);
 	LIBFS_EXPORT bool create_directories(const path& p);
-    LIBFS_EXPORT bool remove_file(const path& p);
-    LIBFS_EXPORT bool resize_file(const path& p, size_t target_length);
+	LIBFS_EXPORT bool remove_file(const path& p);
+	LIBFS_EXPORT bool resize_file(const path& p, size_t target_length);
 
-    // Printing
-    LIBFS_EXPORT std::ostream& operator<<(std::ostream& os, const path& path);
-
+	// Printing
+	LIBFS_EXPORT std::ostream& operator<<(std::ostream& os, const path& path);
 
 } // namespace fs
