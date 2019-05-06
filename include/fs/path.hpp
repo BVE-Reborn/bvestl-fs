@@ -9,12 +9,15 @@
 
 #pragma once
 
+#include "fs/allocation.hpp"
 #include "fs/api.hpp"
 #include "fs/fwd.hpp"
+#include "fs/internal/string.hpp"
+#include "fs/internal/vector.hpp"
 #include <EABase/config/eaplatform.h>
+#include <EASTL/optional.h>
 #include <cinttypes>
-#include <string>
-#include <vector>
+#include <iosfwd>
 
 namespace fs {
 	/**
@@ -37,52 +40,74 @@ namespace fs {
 		};
 
 		// Constructors
-		path() : m_type(path_type::native_path), m_absolute(false) {}
+		explicit path(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		    m_path(handle),
+		    m_type(path_type::native_path),
+		    m_absolute(false) {}
 
 		path(const path& path) = default;
 		path(path&& path) = default;
 		path& operator=(const path& path) = default;
 		path& operator=(path&& path) = default;
 
-		explicit path(const char* string) { set(string); }
-		explicit path(const std::string& string) { set(string); }
+		explicit path(const char* string, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		    m_path(handle),
+		    m_type(path_type::native_path),
+		    m_absolute(false) {
+			set(internal::string(string, handle), path_type::native_path, handle);
+		}
+		explicit path(const internal::string& string, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		    m_path(handle),
+		    m_type(path_type::native_path),
+		    m_absolute(false) {
+			set(string, path_type::native_path, handle);
+		}
 
 #if defined(EA_PLATFORM_WINDOWS)
 		// Windows Constructors impl
-		path(const wchar_t* wstring) { set(wstring); }
-		path(const std::wstring& wstring) { set(wstring); }
+		path(const wchar_t* wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) {
+			set(internal::wstring(wstring, handle), handle);
+		}
+		path(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) { set(wstring, handle); }
 
-		path& operator=(const std::wstring& str) {
+		path& operator=(const internal::wstring& str) {
 			set(str);
 			return *this;
 		}
 #endif
 
 		// Internal set-from string functions
-		void set(const std::string& str, path_type type = path_type::native_path);
+		EA_FORCE_INLINE void set(internal::string const& str, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) {
+			set(str, path_type::native_path, handle);
+		}
+		void set(internal::string const& str, path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 #if defined(EA_PLATFORM_WINDOWS)
-		void set(const std::wstring& wstring, path_type type = native_path);
+		void set(const internal::wstring& wstring, path_type type = native_path);
 #endif
 
-		std::string str(path_type type = path_type::native_path) const;
+		// Get-string functions
+		EA_FORCE_INLINE internal::string str(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const {
+			return str(path_type::native_path, handle);
+		}
+		internal::string str(path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 #if defined(EA_PLATFORM_WINDOWS)
 		std::wstring wstr(path_type type = native_path) const;
 #endif
 
 		bool empty() const { return m_path.empty(); }
 		size_t length() const { return m_path.size(); }
-		std::string filename() const;
-		std::string extension() const;
+		internal::string filename(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
+		internal::string extension(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 
-		size_t file_size() const;
-		bool file_exists() const;
+		size_t file_size(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
+		bool file_exists(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 
 		bool is_absolute() const { return m_absolute; }
-		bool is_directory() const;
-		bool is_file() const;
+		bool is_directory(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
+		bool is_file(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 
-		path make_absolute() const;
-		path parent_path() const;
+		path make_absolute(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
+		path parent_path(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 
 		// Comparison Operators
 		bool operator==(const path& p) const { return p.m_path == m_path; }
@@ -91,24 +116,30 @@ namespace fs {
 		// Modification Operators
 		path operator/(const path& other) const;
 
+		// Friend
+		friend std::ostream& operator<<(std::ostream&, const path&);
+
 	  protected:
-		static std::vector<std::string> tokenize(const std::string& string, const std::string& delim);
+		static internal::vector<internal::string> tokenize(const internal::string& string,
+		                                                   const internal::string& delim,
+		                                                   eastl::polyalloc::allocator_handle handle);
+
 #if defined(EA_PLATFORM_WINDOWS)
 		static const size_t MAX_PATH_WINDOWS = 32767;
 #endif
 		static const size_t MAX_PATH_WINDOWS_LEGACY = 260;
-		std::vector<std::string> m_path;
+		internal::vector<internal::string> m_path;
 		path_type m_type;
 		bool m_absolute;
 	};
 
 	// Utility
-	LIBFS_EXPORT path cwd();
+	LIBFS_EXPORT path cwd(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 
-	LIBFS_EXPORT bool create_directory(const path& p);
-	LIBFS_EXPORT bool create_directories(const path& p);
-	LIBFS_EXPORT bool remove_file(const path& p);
-	LIBFS_EXPORT bool resize_file(const path& p, size_t target_length);
+	LIBFS_EXPORT bool create_directory(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool create_directories(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool remove_file(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool resize_file(const path& p, size_t target_length, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 
 	// Printing
 	LIBFS_EXPORT std::ostream& operator<<(std::ostream& os, const path& path);

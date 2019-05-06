@@ -13,7 +13,7 @@ namespace fs {
 		~mallocator() override = default;
 
 		void* allocate(size_t n, int = 0) override { return malloc(n); }
-		void* allocate(size_t n, size_t alignment, size_t, int = 0) override { return aligned_alloc(n, alignment); }
+		void* allocate(size_t n, size_t, size_t, int = 0) override { return malloc(n); }
 		void deallocate(void* p, size_t) override { free(p); }
 	};
 

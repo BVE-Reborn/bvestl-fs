@@ -5,6 +5,11 @@
 using namespace std;
 using namespace fs;
 
+std::ostream& operator<<(std::ostream& os, fs::internal::string str) {
+	os.write(str.c_str(), str.size());
+	return os;
+}
+
 int main(int argc, char** argv) {
 #if !defined(EA_PLATFORM_WINDOWS)
 	path path1("/dir 1/dir 2/");
@@ -12,6 +17,7 @@ int main(int argc, char** argv) {
 	path path1("C:\\dir 1\\dir 2\\");
 #endif
 	path path2("dir 3");
+	path path3(path1); // NOLINT(performance-unnecessary-copy-initialization)
 
 	cout << path1.file_exists() << endl;
 	cout << path1 << endl;
@@ -28,7 +34,7 @@ int main(int argc, char** argv) {
 	cout << "nonexistant:is_file = " << path("nonexistant").is_file() << endl;
 	cout << "nonexistant:is_directory = " << path("nonexistant").is_directory() << endl;
 	cout << "nonexistant:filename = " << path("nonexistant").filename() << endl;
-	cout << "nonexistant:extension = " << path("nonexistant").extension() << endl;
+	cout << "nonexistant:extension = " << path("nonexistant").extension(eastl::polyalloc::allocator_handle()) << endl;
 	//	cout << "include/fs/path.hpp:exists = " << path("include/fs/path.hpp").file_exists() << endl;
 	//	cout << "include/fs/path.hpp:is_file = " << path("include/fs/path.hpp").is_file() << endl;
 	//	cout << "include/fs/path.hpp:is_directory = " << path("include/fs/path.hpp").is_directory() << endl;
@@ -38,11 +44,12 @@ int main(int argc, char** argv) {
 	cout << "../include/fs:file_exists = " << path("../include/fs").file_exists() << endl;
 	cout << "../include/fs:is_file = " << path("../include/fs").is_file() << endl;
 	cout << "../include/fs:is_directory = " << path("../include/fs").is_directory() << endl;
-	cout << "../include/fs:extension = " << path("../include/fs").extension() << endl;
+	cout << "../include/fs:extension = " << path("../include/fs").extension(eastl::polyalloc::allocator_handle()) << endl;
 	cout << "../include/fs:filename = " << path("../include/fs").filename() << endl;
 	cout << "../include/fs:make_absolute = " << path("../include/fs").make_absolute() << endl;
 
 	cout << "resolve(include/fs/path.hpp) = " << resolver().resolve(fs::path("include/fs/path.hpp")) << endl;
 	cout << "resolve(nonexistant) = " << resolver().resolve(fs::path("nonexistant")) << endl;
+	cout << "copy 1 = " << path3 << '\n';
 	return 0;
 }
