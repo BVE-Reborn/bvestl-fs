@@ -15,7 +15,6 @@
 
 #include <EASTL/type_traits.h>
 #include <cstring>
-#include <fmt/format.h>
 #include <sstream>
 #include <stdexcept>
 

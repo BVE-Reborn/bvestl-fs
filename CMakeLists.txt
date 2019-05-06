@@ -5,7 +5,6 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 
 find_package(eastl-polyalloc CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
@@ -23,7 +22,7 @@ file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS "tests/*
 add_library(fs ${SOURCES} ${HEADERS})
 target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
 target_compile_options(fs PRIVATE -Wall -Wextra -Wpedantic)
-target_link_libraries(fs PUBLIC eastl::polyalloc fmt::fmt)
+target_link_libraries(fs PUBLIC eastl::polyalloc)
 
 generate_export_header(
         fs
