@@ -1,9 +1,11 @@
 #include "fs/resolver.hpp"
 
+#include <ostream>
+
 fs::path fs::resolver::resolve(fs::path const& value) const {
 	for (const auto& m_path : m_paths) {
 		path combined = m_path / value;
-		if (combined.exists())
+		if (combined.file_exists())
 			return combined;
 	}
 	return value;

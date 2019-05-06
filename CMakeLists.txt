@@ -21,6 +21,7 @@ file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS "tests/*
 
 add_library(fs ${SOURCES} ${HEADERS})
 target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
+target_compile_options(fs PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(fs PUBLIC eastl::polyalloc)
 
 generate_export_header(

@@ -28,43 +28,23 @@ namespace fs {
 		using const_iterator = eastl::vector<path, eastl::polyalloc::allocator_handle>::const_iterator;
 
 		explicit resolver(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) : m_paths(handle) {
-			m_paths.push_back(path::getcwd());
+			m_paths.push_back(getcwd());
 		}
 
-		size_t size() const {
-			return m_paths.size();
-		}
+		size_t size() const { return m_paths.size(); }
 
-		iterator begin() {
-			return m_paths.begin();
-		}
-		iterator end() {
-			return m_paths.end();
-		}
+		iterator begin() { return m_paths.begin(); }
+		iterator end() { return m_paths.end(); }
 
-		const_iterator begin() const {
-			return m_paths.begin();
-		}
-		const_iterator end() const {
-			return m_paths.end();
-		}
+		const_iterator begin() const { return m_paths.begin(); }
+		const_iterator end() const { return m_paths.end(); }
 
-		void erase(iterator it) {
-			m_paths.erase(it);
-		}
+		void erase(iterator it) { m_paths.erase(it); }
 
-		void prepend(const path& path) {
-			m_paths.insert(m_paths.begin(), path);
-		}
-		void append(const path& path) {
-			m_paths.push_back(path);
-		}
-		const path& operator[](size_t index) const {
-			return m_paths[index];
-		}
-		path& operator[](size_t index) {
-			return m_paths[index];
-		}
+		void prepend(const path& path) { m_paths.insert(m_paths.begin(), path); }
+		void append(const path& path) { m_paths.push_back(path); }
+		const path& operator[](size_t index) const { return m_paths[index]; }
+		path& operator[](size_t index) { return m_paths[index]; }
 
 		path resolve(const path& value) const;
 
