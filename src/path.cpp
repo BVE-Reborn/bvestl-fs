@@ -84,8 +84,8 @@ bool fs::path::is_file(eastl::polyalloc::allocator_handle handle) const {
 fs::internal::string fs::path::extension(eastl::polyalloc::allocator_handle handle) const {
 	const internal::string& name = filename(handle);
 	size_t pos = name.find_last_of('.');
-	if (pos == std::string::npos)
-		return "";
+	if (pos == internal::string::npos)
+		return internal::string(handle);
 	return internal::substr(name, pos + 1, handle);
 }
 
@@ -102,7 +102,7 @@ fs::path fs::path::parent_path(eastl::polyalloc::allocator_handle handle) const 
 
 	if (m_path.empty()) {
 		if (!m_absolute)
-			result.m_path.emplace_back("..");
+			result.m_path.emplace_back("..", handle);
 	}
 	else {
 		size_t until = m_path.size() - 1;
