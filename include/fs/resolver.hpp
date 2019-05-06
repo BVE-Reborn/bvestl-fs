@@ -11,6 +11,7 @@
 
 #include "fs/allocation.hpp"
 #include "fs/path.hpp"
+#include <EASTL/vector.h>
 
 namespace fs {
 
@@ -23,10 +24,10 @@ namespace fs {
 	 */
 	class LIBFS_EXPORT resolver {
 	  public:
-		typedef std::vector<path>::iterator iterator;
-		typedef std::vector<path>::const_iterator const_iterator;
+		using iterator = eastl::vector<path, eastl::polyalloc::allocator_handle>::iterator;
+		using const_iterator = eastl::vector<path, eastl::polyalloc::allocator_handle>::const_iterator;
 
-		resolver() {
+		explicit resolver(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) : m_paths(handle) {
 			m_paths.push_back(path::getcwd());
 		}
 
@@ -70,7 +71,7 @@ namespace fs {
 		LIBFS_EXPORT friend std::ostream& operator<<(std::ostream& os, const resolver& r);
 
 	  private:
-		std::vector<path> m_paths;
+		eastl::vector<path, eastl::polyalloc::allocator_handle> m_paths;
 	};
 
 } // namespace fs
