@@ -42,7 +42,7 @@ cache:
   - c:\tools\vcpkg\packages\ -> tools/ci/appveyor.yaml tools/vcpkg/setup.py
 
 test_script:
-  - cmd: C:\projects\libfs\build\bin\%CONFIGURATION%\tests.exe
+  - cmd: C:\projects\libfs\build\%CONFIGURATION%\path_demo.exe -- C:\projects\libfs\build\%CONFIGURATION%\test-tree
 
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/DiscordHooks/appveyor-discord-webhook/master/send.ps1 -o send.ps1
