@@ -23,6 +23,7 @@
 
 #include <EASTL/type_traits.h>
 #include <algorithm>
+#include <cctype>
 #include <sstream>
 #include <stdexcept>
 
