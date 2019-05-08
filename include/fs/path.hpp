@@ -66,17 +66,17 @@ namespace fs {
 		// Windows Constructors impl
 #if defined(EA_PLATFORM_WINDOWS)
 		path(const wchar_t* wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
-			m_path(handle),
-			m_type(path_type::native_path),
-			m_absolute(false) 
-		{
+		    m_path(handle),
+		    m_type(path_type::native_path),
+		    m_absolute(false) {
 			set(internal::wstring(wstring, handle), handle);
 		}
 		path(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
-			m_path(handle),
-			m_type(path_type::native_path),
-			m_absolute(false) 
-		{ set(wstring, handle); }
+		    m_path(handle),
+		    m_type(path_type::native_path),
+		    m_absolute(false) {
+			set(wstring, handle);
+		}
 
 		path& operator=(const internal::wstring& str) {
 			set(str, m_path.get_allocator());
@@ -152,9 +152,8 @@ namespace fs {
 	LIBFS_EXPORT path cwd(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 
 	LIBFS_EXPORT bool create_directory(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
-	LIBFS_EXPORT bool create_directory_recursive(const path& p,
-                                                 eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
-    LIBFS_EXPORT bool remove_directory(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool create_directory_recursive(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool remove_directory(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 	LIBFS_EXPORT bool remove_directory_recursive(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 	LIBFS_EXPORT bool remove_file(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 	LIBFS_EXPORT bool resize_file(const path& p, size_t target_length, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);

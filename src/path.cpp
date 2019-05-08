@@ -2,19 +2,19 @@
 #include "fs/path.hpp"
 
 #if !defined(EA_PLATFORM_WINDOWS) && !defined(EA_PLATFORM_POSIX)
-    #error "FS Library designed for windows or POSIX only"
+#	error "FS Library designed for windows or POSIX only"
 #endif
 
 #if defined(EA_PLATFORM_WINDOWS)
 #	define WIN32_LEAN_AND_MEAN
-#   define NOMINMAX
+#	define NOMINMAX
 #	include <ShlObj.h>
-#   include <shellapi.h>
+#	include <shellapi.h>
 #	include <Windows.h>
 #else
 #	include <unistd.h>
 #	include <sys/stat.h>
-#   include <ftw.h>
+#	include <ftw.h>
 #endif
 
 #if defined(EA_PLATFORM_LINUX)
@@ -22,10 +22,10 @@
 #endif
 
 #include <EASTL/type_traits.h>
+#include <algorithm>
 #include <cstring>
 #include <sstream>
 #include <stdexcept>
-#include <algorithm>
 
 fs::path fs::path::make_absolute(eastl::polyalloc::allocator_handle handle) const {
 #if !defined(_WIN32)
@@ -276,10 +276,10 @@ bool fs::remove_directory(fs::path const& p, eastl::polyalloc::allocator_handle 
 #if defined(EA_PLATFORM_WINDOWS)
 	return RemoveDirectoryW(p.wstr(handle).c_str()) != 0;
 #else
-    if(rmdir(p.str(handle).c_str())) {
-        return false;
-    }
-    return true;
+	if (rmdir(p.str(handle).c_str())) {
+		return false;
+	}
+	return true;
 #endif
 }
 
@@ -288,31 +288,21 @@ bool fs::remove_directory_recursive(fs::path const& p, eastl::polyalloc::allocat
 	internal::wstring copy(p.wstr(handle), handle);
 	copy.push_back('\0');
 
-	SHFILEOPSTRUCTW file_op{
-		nullptr,
-		FO_DELETE,
-		copy.c_str(),
-		L"",
-		FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT,
-		false,
-		nullptr,
-		L""
-	};
+	SHFILEOPSTRUCTW file_op{nullptr, FO_DELETE, copy.c_str(), L"", FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT, false, nullptr, L""};
 	int const ret = SHFileOperationW(&file_op);
 	return ret == 0;
 #else
-    auto rem_func = [](const char *f_path, const struct stat * /*stat_buffer*/, int /*typeflag*/, struct FTW */*ftwbuf*/) -> int {
-        return remove(f_path);
-    };
+	auto rem_func = [](const char* f_path, const struct stat* /*stat_buffer*/, int /*typeflag*/, struct FTW * /*ftwbuf*/) -> int {
+		return remove(f_path);
+	};
 
-    if(nftw(p.str(handle).c_str(), rem_func, 128, FTW_DEPTH)) {
-        // TODO: Error checking
-        return false;
-    }
-    return true;
+	if (nftw(p.str(handle).c_str(), rem_func, 128, FTW_DEPTH)) {
+		// TODO: Error checking
+		return false;
+	}
+	return true;
 #endif
 }
-
 
 fs::internal::vector<fs::internal::string> fs::path::tokenize(const fs::internal::string& string,
                                                               const fs::internal::string& delim,
