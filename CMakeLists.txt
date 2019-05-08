@@ -4,6 +4,8 @@ project(libfs LANGUAGES CXX)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 
+find_package(doctest CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 find_package(eastl-polyalloc CONFIG REQUIRED)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -54,4 +56,4 @@ install(
 # tests #
 #########
 add_executable(path_demo ${TEST_SOURCES})
-target_link_libraries(path_demo PRIVATE fs)
+target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt)
