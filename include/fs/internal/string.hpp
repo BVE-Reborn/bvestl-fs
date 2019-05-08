@@ -13,4 +13,10 @@ namespace fs::internal {
 	inline string substr(string const& str, std::size_t start, std::size_t count, eastl::polyalloc::allocator_handle handle) {
 		return string(str.begin() + start, str.begin() + start + count, handle);
 	}
+	inline wstring substr(wstring const& str, std::size_t start, eastl::polyalloc::allocator_handle handle) {
+		return wstring(str.begin() + start, str.end(), handle);
+	}
+	inline wstring substr(wstring const& str, std::size_t start, std::size_t count, eastl::polyalloc::allocator_handle handle) {
+		return wstring(str.begin() + start, str.begin() + start + count, handle);
+	}
 } // namespace fs::internal

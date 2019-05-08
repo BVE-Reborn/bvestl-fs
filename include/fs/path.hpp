@@ -63,15 +63,23 @@ namespace fs {
 			set(string, path_type::native_path, handle);
 		}
 
-#if defined(EA_PLATFORM_WINDOWS)
 		// Windows Constructors impl
-		path(const wchar_t* wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) {
+#if defined(EA_PLATFORM_WINDOWS)
+		path(const wchar_t* wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+			m_path(handle),
+			m_type(path_type::native_path),
+			m_absolute(false) 
+		{
 			set(internal::wstring(wstring, handle), handle);
 		}
-		path(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) { set(wstring, handle); }
+		path(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+			m_path(handle),
+			m_type(path_type::native_path),
+			m_absolute(false) 
+		{ set(wstring, handle); }
 
 		path& operator=(const internal::wstring& str) {
-			set(str);
+			set(str, m_path.get_allocator());
 			return *this;
 		}
 #endif
@@ -82,7 +90,10 @@ namespace fs {
 		}
 		void set(internal::string const& str, path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 #if defined(EA_PLATFORM_WINDOWS)
-		void set(const internal::wstring& wstring, path_type type = native_path);
+		void set(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) {
+			return set(wstring, path_type::native_path, handle);
+		}
+		void set(const internal::wstring& wstring, path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 #endif
 
 		// Get-string functions
@@ -91,7 +102,10 @@ namespace fs {
 		}
 		internal::string str(path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 #if defined(EA_PLATFORM_WINDOWS)
-		std::wstring wstr(path_type type = native_path) const;
+		EA_FORCE_INLINE fs::internal::wstring wstr(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const {
+			return wstr(path_type::native_path, handle);
+		}
+		fs::internal::wstring wstr(path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 #endif
 
 		bool empty() const { return m_path.empty(); }
@@ -119,15 +133,16 @@ namespace fs {
 		// Friend
 		friend std::ostream& operator<<(std::ostream&, const path&);
 
+#if defined(EA_PLATFORM_WINDOWS)
+		static const size_t MAX_PATH_WINDOWS = 32767;
+#endif
+		static const size_t MAX_PATH_WINDOWS_LEGACY = 260;
+
 	  protected:
 		static internal::vector<internal::string> tokenize(const internal::string& string,
 		                                                   const internal::string& delim,
 		                                                   eastl::polyalloc::allocator_handle handle);
 
-#if defined(EA_PLATFORM_WINDOWS)
-		static const size_t MAX_PATH_WINDOWS = 32767;
-#endif
-		static const size_t MAX_PATH_WINDOWS_LEGACY = 260;
 		internal::vector<internal::string> m_path;
 		path_type m_type;
 		bool m_absolute;

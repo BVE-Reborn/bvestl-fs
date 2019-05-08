@@ -4,6 +4,12 @@ project(libfs LANGUAGES CXX)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 
+find_library(EASTL_NAME EASTL)
+add_library(eastl::lib INTERFACE IMPORTED)
+set_property(TARGET eastl::lib
+			 PROPERTY INTERFACE_LINK_LIBRARIES ${EASTL_NAME}
+)
+
 find_package(doctest CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(eastl-polyalloc CONFIG REQUIRED)
@@ -23,7 +29,11 @@ file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS "tests/*
 
 add_library(fs ${SOURCES} ${HEADERS})
 target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
-target_compile_options(fs PRIVATE -Wall -Wextra -Wpedantic)
+if(WIN32)
+	target_compile_options(fs PRIVATE /experimental:external /external:anglebrackets /external:W0)
+else()
+	target_compile_options(fs PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 target_link_libraries(fs PUBLIC eastl::polyalloc)
 
 generate_export_header(
@@ -56,4 +66,4 @@ install(
 # tests #
 #########
 add_executable(path_demo ${TEST_SOURCES})
-target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt)
+target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt eastl::lib)
