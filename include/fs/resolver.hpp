@@ -24,8 +24,8 @@ namespace fs {
 	 */
 	class LIBFS_EXPORT resolver {
 	  public:
-		using iterator = eastl::vector<path, eastl::polyalloc::allocator_handle>::iterator;
-		using const_iterator = eastl::vector<path, eastl::polyalloc::allocator_handle>::const_iterator;
+		using iterator = internal::vector<path>::iterator;
+		using const_iterator = internal::vector<path>::const_iterator;
 
 		explicit resolver(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) : m_paths(handle) {
 			m_paths.push_back(cwd());
@@ -39,19 +39,19 @@ namespace fs {
 		const_iterator begin() const { return m_paths.begin(); }
 		const_iterator end() const { return m_paths.end(); }
 
-		void erase(iterator it) { m_paths.erase(it); }
+		void erase(iterator const it) { m_paths.erase(it); }
 
 		void prepend(const path& path) { m_paths.insert(m_paths.begin(), path); }
 		void append(const path& path) { m_paths.push_back(path); }
-		const path& operator[](size_t index) const { return m_paths[index]; }
-		path& operator[](size_t index) { return m_paths[index]; }
+		const path& operator[](size_t const index) const { return m_paths[index]; }
+		path& operator[](size_t const index) { return m_paths[index]; }
 
 		path resolve(const path& value) const;
 
 		friend std::ostream& operator<<(std::ostream&, const resolver&);
 
 	  private:
-		eastl::vector<path, eastl::polyalloc::allocator_handle> m_paths;
+		internal::vector<path> m_paths;
 	};
 
 	LIBFS_EXPORT std::ostream& operator<<(std::ostream& os, const resolver& r);

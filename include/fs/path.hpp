@@ -40,7 +40,7 @@ namespace fs {
 		};
 
 		// Constructors
-		explicit path(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		explicit path(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) :
 		    m_path(handle),
 		    m_type(path_type::native_path),
 		    m_absolute(false) {}
@@ -50,13 +50,13 @@ namespace fs {
 		path& operator=(const path& path) = default;
 		path& operator=(path&& path) = default;
 
-		explicit path(const char* string, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		explicit path(const char* string, eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) :
 		    m_path(handle),
 		    m_type(path_type::native_path),
 		    m_absolute(false) {
 			set(internal::string(string, handle), path_type::native_path, handle);
 		}
-		explicit path(const internal::string& string, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		explicit path(const internal::string& string, eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) :
 		    m_path(handle),
 		    m_type(path_type::native_path),
 		    m_absolute(false) {
@@ -65,13 +65,13 @@ namespace fs {
 
 		// Windows Constructors impl
 #if defined(EA_PLATFORM_WINDOWS)
-		path(const wchar_t* wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		path(const wchar_t* wstring, eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) :
 		    m_path(handle),
 		    m_type(path_type::native_path),
 		    m_absolute(false) {
 			set(internal::wstring(wstring, handle), handle);
 		}
-		path(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) :
+		path(const internal::wstring& wstring, eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) :
 		    m_path(handle),
 		    m_type(path_type::native_path),
 		    m_absolute(false) {
@@ -85,27 +85,27 @@ namespace fs {
 #endif
 
 		// Internal set-from string functions
-		EA_FORCE_INLINE void set(internal::string const& str, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) {
+		EA_FORCE_INLINE void set(internal::string const& str, eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) {
 			set(str, path_type::native_path, handle);
 		}
 		void set(internal::string const& str, path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 #if defined(EA_PLATFORM_WINDOWS)
-		void set(const internal::wstring& wstring, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) {
+		void set(const internal::wstring& wstring, eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) {
 			return set(wstring, path_type::native_path, handle);
 		}
 		void set(const internal::wstring& wstring, path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 #endif
 
 		// Get-string functions
-		EA_FORCE_INLINE internal::string str(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const {
+		EA_FORCE_INLINE internal::string str(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) const {
 			return str(path_type::native_path, handle);
 		}
 		internal::string str(path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 #if defined(EA_PLATFORM_WINDOWS)
-		EA_FORCE_INLINE fs::internal::wstring wstr(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const {
+		EA_FORCE_INLINE internal::wstring wstr(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) const {
 			return wstr(path_type::native_path, handle);
 		}
-		fs::internal::wstring wstr(path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
+		internal::wstring wstr(path_type type, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC) const;
 #endif
 
 		bool empty() const { return m_path.empty(); }
@@ -140,7 +140,7 @@ namespace fs {
 
 	  protected:
 		static internal::vector<internal::string> tokenize(const internal::string& string,
-		                                                   const internal::string& delim,
+		                                                   const internal::string& deliminator,
 		                                                   eastl::polyalloc::allocator_handle handle);
 
 		internal::vector<internal::string> m_path;

@@ -23,11 +23,10 @@
 
 #include <EASTL/type_traits.h>
 #include <algorithm>
-#include <cstring>
 #include <sstream>
 #include <stdexcept>
 
-fs::path fs::path::make_absolute(eastl::polyalloc::allocator_handle handle) const {
+fs::path fs::path::make_absolute(eastl::polyalloc::allocator_handle const handle) const {
 #if !defined(_WIN32)
 	char temp[PATH_MAX];
 	if (realpath(str(path_type::posix_path, handle).c_str(), temp) == nullptr)
@@ -35,14 +34,14 @@ fs::path fs::path::make_absolute(eastl::polyalloc::allocator_handle handle) cons
 	return path(temp, handle);
 #else
 	internal::wstring value = wstr(handle), out(MAX_PATH_WINDOWS, '\0', handle);
-	DWORD length = GetFullPathNameW(value.c_str(), MAX_PATH_WINDOWS, &out[0], NULL);
+	DWORD const length = GetFullPathNameW(value.c_str(), MAX_PATH_WINDOWS, &out[0], nullptr);
 	if (length == 0)
 		throw std::runtime_error("Internal error in realpath(): " + std::to_string(GetLastError()));
 	return path(internal::substr(out, 0, length, handle), handle);
 #endif
 }
 
-bool fs::path::file_exists(eastl::polyalloc::allocator_handle handle) const {
+bool fs::path::file_exists(eastl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
 	return GetFileAttributesW(wstr(handle).c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
@@ -51,7 +50,7 @@ bool fs::path::file_exists(eastl::polyalloc::allocator_handle handle) const {
 #endif
 }
 
-size_t fs::path::file_size(eastl::polyalloc::allocator_handle handle) const {
+size_t fs::path::file_size(eastl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
 	struct _stati64 sb;
 	if (_wstati64(wstr(handle).c_str(), &sb) != 0)
@@ -61,12 +60,12 @@ size_t fs::path::file_size(eastl::polyalloc::allocator_handle handle) const {
 	if (stat(str(path_type::posix_path, handle).c_str(), &sb) != 0)
 		throw std::runtime_error(("path::file_size(): cannot stat file \"" + str(path_type::posix_path, handle) + "\"!").c_str());
 #endif
-	return (size_t) sb.st_size;
+	return static_cast<size_t>(sb.st_size);
 }
 
-bool fs::path::is_directory(eastl::polyalloc::allocator_handle handle) const {
+bool fs::path::is_directory(eastl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
-	DWORD result = GetFileAttributesW(wstr(handle).c_str());
+	DWORD const result = GetFileAttributesW(wstr(handle).c_str());
 	if (result == INVALID_FILE_ATTRIBUTES)
 		return false;
 	return (result & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -78,9 +77,9 @@ bool fs::path::is_directory(eastl::polyalloc::allocator_handle handle) const {
 #endif
 }
 
-bool fs::path::is_file(eastl::polyalloc::allocator_handle handle) const {
+bool fs::path::is_file(eastl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
-	DWORD attr = GetFileAttributesW(wstr(handle).c_str());
+	DWORD const attr = GetFileAttributesW(wstr(handle).c_str());
 	return (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
 	struct stat sb {};
@@ -90,15 +89,15 @@ bool fs::path::is_file(eastl::polyalloc::allocator_handle handle) const {
 #endif
 }
 
-fs::internal::string fs::path::extension(eastl::polyalloc::allocator_handle handle) const {
+fs::internal::string fs::path::extension(eastl::polyalloc::allocator_handle const handle) const {
 	const internal::string& name = filename(handle);
-	size_t pos = name.find_last_of('.');
+	size_t const pos = name.find_last_of('.');
 	if (pos == internal::string::npos)
 		return internal::string(handle);
 	return internal::substr(name, pos + 1, handle);
 }
 
-fs::internal::string fs::path::filename(eastl::polyalloc::allocator_handle handle) const {
+fs::internal::string fs::path::filename(eastl::polyalloc::allocator_handle const handle) const {
 	if (empty())
 		return internal::string(handle);
 	const internal::string& last = m_path[m_path.size() - 1];
@@ -114,14 +113,14 @@ fs::path fs::path::parent_path(eastl::polyalloc::allocator_handle handle) const 
 			result.m_path.emplace_back("..", handle);
 	}
 	else {
-		size_t until = m_path.size() - 1;
+		size_t const until = m_path.size() - 1;
 		for (size_t i = 0; i < until; ++i)
 			result.m_path.push_back(m_path[i]);
 	}
 	return result;
 }
 
-fs::path fs::path::operator/(fs::path const& other) const {
+fs::path fs::path::operator/(path const& other) const {
 	if (other.m_absolute)
 		throw std::runtime_error("path::operator/(): expected a relative path!");
 	if (m_type != other.m_type)
@@ -136,7 +135,7 @@ fs::path fs::path::operator/(fs::path const& other) const {
 	return result;
 }
 
-fs::internal::string fs::path::str(path_type type, eastl::polyalloc::allocator_handle handle) const {
+fs::internal::string fs::path::str(path_type const type, eastl::polyalloc::allocator_handle const handle) const {
 	internal::string out_str(handle);
 
 	if (m_absolute) {
@@ -173,7 +172,7 @@ fs::internal::string fs::path::str(path_type type, eastl::polyalloc::allocator_h
 	return out_str;
 }
 
-void fs::path::set(internal::string const& str, path_type type, eastl::polyalloc::allocator_handle handle) {
+void fs::path::set(internal::string const& str, path_type const type, eastl::polyalloc::allocator_handle const handle) {
 	m_type = type;
 	if (type == path_type::windows_path) {
 		internal::string tmp(str, handle);
@@ -195,20 +194,20 @@ void fs::path::set(internal::string const& str, path_type type, eastl::polyalloc
 	}
 }
 
-std::ostream& fs::operator<<(std::ostream& os, fs::path const& path) {
+std::ostream& fs::operator<<(std::ostream& os, path const& path) {
 	os << path.str(path::path_type::native_path, path.m_path.get_allocator()).c_str();
 	return os;
 }
 
-bool fs::create_directory(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+bool fs::create_directory(path const& p, eastl::polyalloc::allocator_handle const handle) {
 #if defined(_WIN32)
-	return CreateDirectoryW(p.wstr(handle).c_str(), NULL) != 0;
+	return CreateDirectoryW(p.wstr(handle).c_str(), nullptr) != 0;
 #else
 	return mkdir(p.str(path::path_type::posix_path, handle).c_str(), S_IRWXU) == 0;
 #endif
 }
 
-bool fs::create_directory_recursive(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+bool fs::create_directory_recursive(path const& p, eastl::polyalloc::allocator_handle const handle) {
 #if defined(_WIN32)
 	return SHCreateDirectory(nullptr, p.make_absolute(handle).wstr(handle).c_str()) == ERROR_SUCCESS;
 #else
@@ -228,7 +227,7 @@ bool fs::create_directory_recursive(fs::path const& p, eastl::polyalloc::allocat
 #endif
 }
 
-bool fs::remove_file(const path& p, eastl::polyalloc::allocator_handle handle) {
+bool fs::remove_file(const path& p, eastl::polyalloc::allocator_handle const handle) {
 #if !defined(_WIN32)
 	return std::remove(p.str(path::path_type::posix_path, handle).c_str()) == 0;
 #else
@@ -236,7 +235,7 @@ bool fs::remove_file(const path& p, eastl::polyalloc::allocator_handle handle) {
 #endif
 }
 
-bool fs::resize_file(const path& p, size_t target_length, eastl::polyalloc::allocator_handle handle) {
+bool fs::resize_file(const path& p, size_t const target_length, eastl::polyalloc::allocator_handle const handle) {
 #if !defined(_WIN32)
 	return ::truncate(p.str(path::path_type::posix_path, handle).c_str(), (off_t) target_length) == 0;
 #else
@@ -245,7 +244,7 @@ bool fs::resize_file(const path& p, size_t target_length, eastl::polyalloc::allo
 		return false;
 	LARGE_INTEGER size;
 	size.QuadPart = static_cast<LONGLONG>(target_length);
-	if (SetFilePointerEx(file_handle, size, NULL, FILE_BEGIN) == 0) {
+	if (SetFilePointerEx(file_handle, size, nullptr, FILE_BEGIN) == 0) {
 		CloseHandle(file_handle);
 		return false;
 	}
@@ -258,7 +257,7 @@ bool fs::resize_file(const path& p, size_t target_length, eastl::polyalloc::allo
 #endif
 }
 
-fs::path fs::cwd(eastl::polyalloc::allocator_handle handle) {
+fs::path fs::cwd(eastl::polyalloc::allocator_handle const handle) {
 #if !defined(_WIN32)
 	char temp[PATH_MAX];
 	if (::getcwd(temp, PATH_MAX) == nullptr)
@@ -272,7 +271,7 @@ fs::path fs::cwd(eastl::polyalloc::allocator_handle handle) {
 #endif
 }
 
-bool fs::remove_directory(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+bool fs::remove_directory(path const& p, eastl::polyalloc::allocator_handle const handle) {
 #if defined(EA_PLATFORM_WINDOWS)
 	return RemoveDirectoryW(p.wstr(handle).c_str()) != 0;
 #else
@@ -283,7 +282,7 @@ bool fs::remove_directory(fs::path const& p, eastl::polyalloc::allocator_handle 
 #endif
 }
 
-bool fs::remove_directory_recursive(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+bool fs::remove_directory_recursive(path const& p, eastl::polyalloc::allocator_handle const handle) {
 #if defined(EA_PLATFORM_WINDOWS)
 	internal::wstring copy(p.wstr(handle), handle);
 	copy.push_back('\0');
@@ -304,10 +303,10 @@ bool fs::remove_directory_recursive(fs::path const& p, eastl::polyalloc::allocat
 #endif
 }
 
-fs::internal::vector<fs::internal::string> fs::path::tokenize(const fs::internal::string& string,
-                                                              const fs::internal::string& delim,
-                                                              eastl::polyalloc::allocator_handle handle) {
-	internal::string::size_type lastPos = 0, pos = string.find_first_of(delim, lastPos);
+fs::internal::vector<fs::internal::string> fs::path::tokenize(const internal::string& string,
+                                                              const internal::string& deliminator,
+                                                              eastl::polyalloc::allocator_handle const handle) {
+	internal::string::size_type lastPos = 0, pos = string.find_first_of(deliminator, lastPos);
 	internal::vector<internal::string> tokens(handle);
 
 	while (lastPos != internal::string::npos) {
@@ -317,27 +316,27 @@ fs::internal::vector<fs::internal::string> fs::path::tokenize(const fs::internal
 		lastPos = pos;
 		if (lastPos == internal::string::npos || lastPos + 1 == string.length())
 			break;
-		pos = string.find_first_of(delim, ++lastPos);
+		pos = string.find_first_of(deliminator, ++lastPos);
 	}
 
 	return tokens;
 }
 
 #if defined(_WIN32)
-fs::internal::wstring fs::path::wstr(fs::path::path_type type, eastl::polyalloc::allocator_handle handle) const {
+fs::internal::wstring fs::path::wstr(path_type const type, eastl::polyalloc::allocator_handle const handle) const {
 	internal::string temp = str(type, handle);
-	int const size = MultiByteToWideChar(CP_UTF8, 0, &temp[0], static_cast<int>(temp.size()), NULL, 0);
+	int const size = MultiByteToWideChar(CP_UTF8, 0, &temp[0], static_cast<int>(temp.size()), nullptr, 0);
 	internal::wstring result(size, 0, handle);
 	MultiByteToWideChar(CP_UTF8, 0, &temp[0], static_cast<int>(temp.size()), &result[0], size);
 	return result;
 }
 
-void fs::path::set(const internal::wstring& wstring, fs::path::path_type type, eastl::polyalloc::allocator_handle handle) {
+void fs::path::set(const internal::wstring& wstring, path_type const type, eastl::polyalloc::allocator_handle const handle) {
 	internal::string string(handle);
 	if (!wstring.empty()) {
-		int size = WideCharToMultiByte(CP_UTF8, 0, &wstring[0], static_cast<int>(wstring.size()), NULL, 0, NULL, NULL);
+		int const size = WideCharToMultiByte(CP_UTF8, 0, &wstring[0], static_cast<int>(wstring.size()), nullptr, 0, nullptr, nullptr);
 		string.resize(size, 0);
-		WideCharToMultiByte(CP_UTF8, 0, &wstring[0], static_cast<int>(wstring.size()), &string[0], size, NULL, NULL);
+		WideCharToMultiByte(CP_UTF8, 0, &wstring[0], static_cast<int>(wstring.size()), &string[0], size, nullptr, nullptr);
 	}
 	set(string, type, handle);
 }
