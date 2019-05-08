@@ -37,9 +37,9 @@ build:
   verbosity: minimal
 
 cache: 
-  - c:\tools\vcpkg\downloads\ -> tools/ci/appveyor.yaml tools/vcpkg/setup.py
-  - c:\tools\vcpkg\installed\ -> tools/ci/appveyor.yaml tools/vcpkg/setup.py
-  - c:\tools\vcpkg\packages\ -> tools/ci/appveyor.yaml tools/vcpkg/setup.py
+  - c:\tools\vcpkg\downloads\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
+  - c:\tools\vcpkg\installed\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
+  - c:\tools\vcpkg\packages\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
 
 test_script:
   - cmd: C:\projects\libfs\build\%CONFIGURATION%\path_demo.exe -- C:\projects\libfs\build\%CONFIGURATION%\test-tree
