@@ -10,4 +10,3 @@ Uses vcpkg as primary package manager, though is usable without. Requires:
 - `eastl`
 - `eastl-polyalloc` (vcpkg port found in external/vcpkg/ports/)
 - `fmt`
-- 
