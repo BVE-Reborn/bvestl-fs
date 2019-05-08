@@ -137,7 +137,10 @@ namespace fs {
 	LIBFS_EXPORT path cwd(eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 
 	LIBFS_EXPORT bool create_directory(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
-	LIBFS_EXPORT bool create_directories(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool create_directory_recursive(const path& p,
+                                                 eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+    LIBFS_EXPORT bool remove_directory(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
+	LIBFS_EXPORT bool remove_directory_recursive(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 	LIBFS_EXPORT bool remove_file(const path& p, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 	LIBFS_EXPORT bool resize_file(const path& p, size_t target_length, eastl::polyalloc::allocator_handle handle LIBFS_GET_GLOBAL_ALLOC);
 

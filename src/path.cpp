@@ -1,5 +1,9 @@
 #include "fs/path.hpp"
 
+#if !defined(EA_PLATFORM_WINDOWS) && !defined(EA_PLATFORM_POSIX)
+    #error "FS Library designed for windows or POSIX only"
+#endif
+
 #if defined(EA_PLATFORM_WINDOWS)
 #	define WIN32_LEAN_AND_MEAN
 #	include <ShlObj.h>
@@ -7,6 +11,7 @@
 #else
 #	include <unistd.h>
 #	include <sys/stat.h>
+#   include <ftw.h>
 #endif
 
 #if defined(EA_PLATFORM_LINUX)
@@ -199,7 +204,7 @@ bool fs::create_directory(fs::path const& p, eastl::polyalloc::allocator_handle 
 #endif
 }
 
-bool fs::create_directories(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+bool fs::create_directory_recursive(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
 #if defined(_WIN32)
 	return SHCreateDirectory(nullptr, p.make_absolute(handle).wstr(handle).c_str()) == ERROR_SUCCESS;
 #else
@@ -252,7 +257,7 @@ bool fs::resize_file(const path& p, size_t target_length, eastl::polyalloc::allo
 fs::path fs::cwd(eastl::polyalloc::allocator_handle handle) {
 #if !defined(_WIN32)
 	char temp[PATH_MAX];
-	if (::getcwd(temp, PATH_MAX) == NULL)
+	if (::getcwd(temp, PATH_MAX) == nullptr)
 		throw std::runtime_error("Internal error in getcwd(): " + std::string(strerror(errno)));
 	return path(temp, handle);
 #else
@@ -262,6 +267,34 @@ fs::path fs::cwd(eastl::polyalloc::allocator_handle handle) {
 	return path(temp, handle);
 #endif
 }
+
+bool fs::remove_directory(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+#if defined(EA_PLATFORM_WINDOWS)
+
+#else
+    if(rmdir(p.str(handle).c_str())) {
+        return false;
+    }
+    return true;
+#endif
+}
+
+bool fs::remove_directory_recursive(fs::path const& p, eastl::polyalloc::allocator_handle handle) {
+#if defined(EA_PLATFORM_WINDOWS)
+
+#else
+    auto rem_func = [](const char *f_path, const struct stat * /*stat_buffer*/, int /*typeflag*/, struct FTW */*ftwbuf*/) -> int {
+        return remove(f_path);
+    };
+
+    if(nftw(p.str(handle).c_str(), rem_func, 128, FTW_DEPTH)) {
+        // TODO: Error checking
+        return false;
+    }
+    return true;
+#endif
+}
+
 
 fs::internal::vector<fs::internal::string> fs::path::tokenize(const fs::internal::string& string,
                                                               const fs::internal::string& delim,
