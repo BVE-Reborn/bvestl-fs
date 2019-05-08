@@ -34,7 +34,7 @@ def copy_port(name, source_dir, vcpkg_dir):
 	copy_tree(f"external/vcpkg/ports/{name}/", os.path.join(vcpkg_dir, f"ports/{name}/"))
 
 def copy_ports(source_dir, vcpkg_dir):
-	copy_ports("eastl-polyalloc", source_dir, vcpkg_dir)
+	copy_port("eastl-polyalloc", source_dir, vcpkg_dir)
 
 def install_package(name, vcpkg_dir):
 	if subprocess.run(["vcpkg", "install", f"{name}:{target}"]).returncode != 0:
