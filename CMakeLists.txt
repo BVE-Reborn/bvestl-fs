@@ -70,4 +70,4 @@ install(
 # tests #
 #########
 add_executable(path_demo ${TEST_SOURCES})
-target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt bvestl::bvestl)
+target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt bvestl::bvestl eastl::lib)
