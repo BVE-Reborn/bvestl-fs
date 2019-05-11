@@ -10,8 +10,10 @@ set_property(TARGET eastl::lib
 			 PROPERTY INTERFACE_LINK_LIBRARIES ${EASTL_NAME}
 )
 
-find_package(doctest CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
+if(NOT BVESTL_FS_USER)
+	find_package(doctest CONFIG REQUIRED)
+	find_package(fmt CONFIG REQUIRED)
+endif()
 find_package(bvestl CONFIG REQUIRED)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -36,38 +38,40 @@ else()
 endif()
 target_link_libraries(fs PUBLIC bvestl::bvestl)
 set_target_properties(fs
-		PROPERTIES PREFIX "libbvestl-"
+	PROPERTIES PREFIX "libbvestl-"
 )
 
 
 generate_export_header(
-        fs
-        BASE_NAME BVESTL_FS
-        EXPORT_FILE_NAME include/bvestl/fs/api.hpp
+		fs
+		BASE_NAME BVESTL_FS
+		EXPORT_FILE_NAME include/bvestl/fs/api.hpp
 )
 target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
 install(
-        TARGETS fs
-        EXPORT bvestl-fs-config
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		TARGETS fs
+		EXPORT bvestl-fs-config
+		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(
-        EXPORT bvestl-fs-config DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/bvestl-fs
-        NAMESPACE bvestl::
+		EXPORT bvestl-fs-config DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/bvestl-fs
+		NAMESPACE bvestl::
 )
 
 install(
-        DIRECTORY ${CMAKE_SOURCE_DIR}/include/ ${CMAKE_BINARY_DIR}/include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/
-        FILES_MATCHING PATTERN "*.hpp*"
+		DIRECTORY ${CMAKE_SOURCE_DIR}/include/ ${CMAKE_BINARY_DIR}/include/
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/
+		FILES_MATCHING PATTERN "*.hpp*"
 )
 
 #########
 # tests #
 #########
-add_executable(path_demo ${TEST_SOURCES})
-target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt bvestl::bvestl eastl::lib)
+if(NOT BVESTL_FS_USER)
+	add_executable(path_demo ${TEST_SOURCES})
+	target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt bvestl::bvestl eastl::lib)
+endif()
