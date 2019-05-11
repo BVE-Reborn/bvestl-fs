@@ -5,7 +5,7 @@ image: Visual Studio 2017
 platform:
   - x64
 
-clone_folder: c:\projects\libfs
+clone_folder: c:\projects\bvestl-fs
 skip_tags: true
 
 environment:
@@ -27,13 +27,13 @@ install:
   - cmd: C:\Python37-x64\python.exe ./tools/vcpkg/setup.py --vcpkg-dir=c:/tools/vcpkg
 
 before_build:
-  - cmd: cd C:\projects\libfs
+  - cmd: cd C:\projects\bvestl-fs
   - cmd: md build
   - cmd: cd build
   - cmd: cmake .. -G "Visual Studio 15 2017 Win64" -Thost=x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 build:
-  project: C:\projects\libfs\build\libfs.sln
+  project: C:\projects\bvestl-fs\build\bvestl-fs.sln
   verbosity: minimal
 
 cache: 
@@ -42,7 +42,7 @@ cache:
   - c:\tools\vcpkg\packages\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
 
 test_script:
-  - cmd: C:\projects\libfs\build\%CONFIGURATION%\path_demo.exe -- C:\projects\libfs\build\%CONFIGURATION%\test-tree
+  - cmd: C:\projects\bvestl-fs\build\%CONFIGURATION%\path_demo.exe -- C:\projects\bvestl-fs\build\%CONFIGURATION%\test-tree
 
 on_success:
   - ps: Invoke-RestMethod https://raw.githubusercontent.com/DiscordHooks/appveyor-discord-webhook/master/send.ps1 -o send.ps1
