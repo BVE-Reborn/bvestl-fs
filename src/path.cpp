@@ -305,8 +305,8 @@ bool bvestl::fs::remove_directory_recursive(path const& p, bvestl::polyalloc::al
 }
 
 bvestl::fs::internal::vector<bvestl::fs::internal::string> bvestl::fs::path::tokenize(const internal::string& string,
-                                                              const internal::string& deliminator,
-                                                              bvestl::polyalloc::allocator_handle const handle) {
+                                                                                      const internal::string& deliminator,
+                                                                                      bvestl::polyalloc::allocator_handle const handle) {
 	internal::string::size_type lastPos = 0, pos = string.find_first_of(deliminator, lastPos);
 	internal::vector<internal::string> tokens(handle);
 

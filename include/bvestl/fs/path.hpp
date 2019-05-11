@@ -156,7 +156,9 @@ namespace bvestl::fs {
 	BVESTL_FS_EXPORT bool remove_directory(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 	BVESTL_FS_EXPORT bool remove_directory_recursive(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 	BVESTL_FS_EXPORT bool remove_file(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
-	BVESTL_FS_EXPORT bool resize_file(const path& p, size_t target_length, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT bool resize_file(const path& p,
+	                                  size_t target_length,
+	                                  bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 
 	// Printing
 	BVESTL_FS_EXPORT std::ostream& operator<<(std::ostream& os, const path& path);

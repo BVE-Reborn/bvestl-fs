@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bvestl/polyalloc/polyalloc.hpp>
 #include <EASTL/string.h>
+#include <bvestl/polyalloc/polyalloc.hpp>
 
 namespace bvestl::fs::internal {
 	using string = eastl::basic_string<char, bvestl::polyalloc::allocator_handle>;
