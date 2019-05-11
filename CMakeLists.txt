@@ -36,10 +36,20 @@ if(WIN32)
 else()
 	target_compile_options(fs PRIVATE -Wall -Wextra -Wpedantic)
 endif()
-target_link_libraries(fs PUBLIC bvestl::bvestl)
-set_target_properties(fs
-	PROPERTIES PREFIX "libbvestl-"
-)
+target_link_libraries(fs PUBLIC bvestl::bvestl eastl::lib)
+if(WIN32)
+	set_target_properties(fs
+		PROPERTIES 
+			PREFIX "bvestl-"
+		    IMPORT_PREFIX "bvestl-"
+	)
+else()
+	set_target_properties(fs
+		PROPERTIES 
+			PREFIX "libbvestl-"
+		    IMPORT_PREFIX "libbvestl-"
+	)
+endif()
 
 
 generate_export_header(
