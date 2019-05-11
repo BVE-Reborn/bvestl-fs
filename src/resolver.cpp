@@ -1,8 +1,8 @@
-#include "fs/resolver.hpp"
+#include "bvestl/fs/resolver.hpp"
 
 #include <ostream>
 
-fs::path fs::resolver::resolve(path const& value) const {
+bvestl::fs::path bvestl::fs::resolver::resolve(path const& value) const {
 	for (const auto& m_path : m_paths) {
 		path combined = m_path / value;
 		if (combined.file_exists())
@@ -11,7 +11,7 @@ fs::path fs::resolver::resolve(path const& value) const {
 	return value;
 }
 
-std::ostream& fs::operator<<(std::ostream& os, resolver const& r) {
+std::ostream& bvestl::fs::operator<<(std::ostream& os, resolver const& r) {
 	os << "resolver[" << std::endl;
 	for (size_t i = 0; i < r.m_paths.size(); ++i) {
 		os << "  \"" << r.m_paths[i] << "\"";

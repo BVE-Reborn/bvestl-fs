@@ -1,8 +1,8 @@
-#include "fs/allocation.hpp"
+#include "bvestl/fs/allocation.hpp"
 #include <mutex>
 
-namespace fs {
-	class mallocator final : public eastl::polyalloc::allocator {
+namespace bvestl::fs {
+	class mallocator final : public bvestl::polyalloc::allocator {
 	  public:
 		mallocator() = default;
 		mallocator(mallocator const&) = delete;
@@ -19,16 +19,16 @@ namespace fs {
 
 	static std::mutex global_alloc_guard;
 	static mallocator global_alloc_mallocator;
-	static eastl::polyalloc::allocator_handle global_alloc_handle = &global_alloc_mallocator;
+	static bvestl::polyalloc::allocator_handle global_alloc_handle = &global_alloc_mallocator;
 
-	void set_global_allocator(eastl::polyalloc::allocator_handle const& handle) {
+	void set_global_allocator(bvestl::polyalloc::allocator_handle const& handle) {
 		std::lock_guard lg(global_alloc_guard);
 		global_alloc_handle = handle;
 	}
 
-	eastl::polyalloc::allocator_handle get_global_allocator() {
+	bvestl::polyalloc::allocator_handle get_global_allocator() {
 		std::lock_guard lg(global_alloc_guard);
 		return global_alloc_handle;
 	}
 
-} // namespace fs
+} // namespace bvestl::fs

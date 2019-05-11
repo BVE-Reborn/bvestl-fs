@@ -9,7 +9,7 @@
 
 #pragma once
 
-namespace fs {
+namespace bvestl::fs {
 	class path;
 	class resolver;
-} // namespace fs
+} // namespace bvestl::fs

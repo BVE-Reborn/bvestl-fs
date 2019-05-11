@@ -9,11 +9,11 @@
 
 #pragma once
 
-#include "fs/allocation.hpp"
-#include "fs/path.hpp"
+#include "bvestl/fs/allocation.hpp"
+#include "bvestl/fs/path.hpp"
 #include <EASTL/vector.h>
 
-namespace fs {
+namespace bvestl::fs {
 
 	/**
 	 * \brief Simple class for resolving paths on Linux/Windows/Mac OS
@@ -22,12 +22,12 @@ namespace fs {
 	 * and a set of search paths. The implementation walks through the
 	 * search paths in order and stops once the file is found.
 	 */
-	class LIBFS_EXPORT resolver {
+	class BVESTL_FS_EXPORT resolver {
 	  public:
 		using iterator = internal::vector<path>::iterator;
 		using const_iterator = internal::vector<path>::const_iterator;
 
-		explicit resolver(eastl::polyalloc::allocator_handle const handle LIBFS_GET_GLOBAL_ALLOC) : m_paths(handle) {
+		explicit resolver(bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) : m_paths(handle) {
 			m_paths.push_back(cwd());
 		}
 
@@ -54,6 +54,6 @@ namespace fs {
 		internal::vector<path> m_paths;
 	};
 
-	LIBFS_EXPORT std::ostream& operator<<(std::ostream& os, const resolver& r);
+	BVESTL_FS_EXPORT std::ostream& operator<<(std::ostream& os, const resolver& r);
 
-} // namespace fs
+} // namespace bvestl::fs
