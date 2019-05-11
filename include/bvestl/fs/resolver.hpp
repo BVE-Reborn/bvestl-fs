@@ -48,7 +48,7 @@ namespace bvestl::fs {
 
 		path resolve(const path& value) const;
 
-		friend std::ostream& operator<<(std::ostream&, const resolver&);
+		friend BVESTL_FS_EXPORT std::ostream& operator<<(std::ostream&, const resolver&);
 
 	  private:
 		internal::vector<path> m_paths;

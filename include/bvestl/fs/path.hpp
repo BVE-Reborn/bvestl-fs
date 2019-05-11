@@ -131,7 +131,7 @@ namespace bvestl::fs {
 		path operator/(const path& other) const;
 
 		// Friend
-		friend std::ostream& operator<<(std::ostream&, const path&);
+		friend BVESTL_FS_EXPORT std::ostream& operator<<(std::ostream&, const path&);
 
 #if defined(EA_PLATFORM_WINDOWS)
 		static const size_t MAX_PATH_WINDOWS = 32767;
