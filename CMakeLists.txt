@@ -29,38 +29,24 @@ file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS "tests/*
 # libfs #
 #########
 
-add_library(fs ${SOURCES} ${HEADERS})
-target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
+add_library(bvestl-fs ${SOURCES} ${HEADERS})
+target_include_directories(bvestl-fs PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>)
 if(WIN32)
-	target_compile_options(fs PRIVATE /experimental:external /external:anglebrackets /external:W0)
+	target_compile_options(bvestl-fs PRIVATE /experimental:external /external:anglebrackets /external:W0)
 else()
-	target_compile_options(fs PRIVATE -Wall -Wextra -Wpedantic)
+	target_compile_options(bvestl-fs PRIVATE -Wall -Wextra -Wpedantic)
 endif()
-target_link_libraries(fs PUBLIC bvestl::bvestl eastl::lib)
-if(WIN32)
-	set_target_properties(fs
-		PROPERTIES 
-			PREFIX "bvestl-"
-		    IMPORT_PREFIX "bvestl-"
-	)
-else()
-	set_target_properties(fs
-		PROPERTIES 
-			PREFIX "libbvestl-"
-		    IMPORT_PREFIX "libbvestl-"
-	)
-endif()
-
+target_link_libraries(bvestl-fs PUBLIC bvestl::bvestl eastl::lib)
 
 generate_export_header(
-		fs
+		bvestl-fs
 		BASE_NAME BVESTL_FS
 		EXPORT_FILE_NAME include/bvestl/fs/api.hpp
 )
-target_include_directories(fs PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+target_include_directories(bvestl-fs PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
 install(
-		TARGETS fs
+		TARGETS bvestl-fs
 		EXPORT bvestl-fs-config
 		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -83,5 +69,5 @@ install(
 #########
 if(NOT BVESTL_FS_USER)
 	add_executable(path_demo ${TEST_SOURCES})
-	target_link_libraries(path_demo PRIVATE fs doctest::doctest fmt::fmt bvestl::bvestl eastl::lib)
+	target_link_libraries(path_demo PRIVATE bvestl-fs doctest::doctest fmt::fmt bvestl::bvestl eastl::lib)
 endif()
