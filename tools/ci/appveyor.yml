@@ -1,4 +1,4 @@
-version: '0.0.0-{build}'
+version: '0.1.0-{build}'
 
 image: Visual Studio 2017
 
@@ -9,37 +9,31 @@ clone_folder: c:\projects\bvestl-fs
 skip_tags: true
 
 environment:
-  VCPKG_ROOT: C:\Tools\vcpkg
-
-init:
-  - cmd: cmake --version
-  - cmd: msbuild /version
+  PATH: c:\projects\bvestl-fs\cmake-3.14.4-win64-x64\bin;$(PATH)
  
 configuration:
   - Debug
   - Release
 
 install:
-  - cmd: git submodule update --init --recursive
-  - cmd: cd C:\Tools\vcpkg
-  - cmd: git pull --ff -q
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%
-  - cmd: C:\Python37-x64\python.exe ./tools/vcpkg/setup.py --vcpkg-dir=c:/tools/vcpkg
+  - cmd: curl -L --silent --show-error --output cmake.zip https://github.com/Kitware/CMake/releases/download/v3.14.4/cmake-3.14.4-win64-x64.zip
+  - cmd: 7z x -y cmake.zip
+  - cmd: cmake --version
+  - cmd: C:\Python37-x64\python.exe ./build.py
 
 before_build:
   - cmd: cd C:\projects\bvestl-fs
-  - cmd: md build
-  - cmd: cd build
-  - cmd: cmake .. -G "Visual Studio 15 2017 Win64" -Thost=x64 -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmd: cmake -S . -B build -G "Visual Studio 15 2017 Win64" -Thost=x64 -DCMAKE_TOOLCHAIN_FILE=build-vcpkg/scripts/buildsystems/vcpkg.cmake
 
 build:
   project: C:\projects\bvestl-fs\build\bvestl-fs.sln
   verbosity: minimal
 
+after_build:
+  - ps: rm -r -fo -ErrorAction SilentlyContinue build-vcpkg/buildtrees
+
 cache: 
-  - c:\tools\vcpkg\downloads\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
-  - c:\tools\vcpkg\installed\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
-  - c:\tools\vcpkg\packages\ -> tools/ci/appveyor.yaml, tools/vcpkg/setup.py
+  - build-vcpkg -> tools/ci/appveyor.yaml, build.py, .build-py
 
 test_script:
   - cmd: C:\projects\bvestl-fs\build\%CONFIGURATION%\path_demo.exe -- C:\projects\bvestl-fs\build\%CONFIGURATION%\test-tree
