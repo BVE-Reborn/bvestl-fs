@@ -30,7 +30,7 @@ build:
   verbosity: minimal
 
 after_build:
-  - ps: if(Test-Path -Path build-vcpkg/buildtrees) {rm build-vcpkg/buildtrees -ErrorAction Ignore -Fo}
+  - cmd: cmake -E remove_directory build-vcpkg/buildtrees
 
 cache: 
   - build-vcpkg -> tools/ci/appveyor.yaml, build.py, .build-py
