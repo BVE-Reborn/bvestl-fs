@@ -12,9 +12,10 @@
 #	include <shellapi.h>
 #	include <Windows.h>
 #else
-#	include <unistd.h>
-#	include <sys/stat.h>
+#	include <dirent.h>
 #	include <ftw.h>
+#	include <sys/stat.h>
+#	include <unistd.h>
 #endif
 
 #if defined(EA_PLATFORM_LINUX)
@@ -284,11 +285,68 @@ namespace bvestl::fs {
 #endif
 	}
 
+	internal::vector<path> list_directory(const path& p, polyalloc::allocator_handle handle) {
+#if defined(EA_PLATFORM_WINDOWS)
+#else
+		internal::vector<path> paths(handle);
+
+		DIR* dir = opendir(p.str(path::path_type::posix_path, handle).c_str());
+
+		if (dir != nullptr) {
+			dirent* entry;
+			while ((entry = readdir(dir))) {
+				if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+					continue;
+				}
+				paths.emplace_back(p / path(entry->d_name, handle));
+			}
+		}
+
+		return paths;
+#endif
+	}
+
+	internal::vector<path> list_directory_recursive(const path& p, polyalloc::allocator_handle handle) {
+#if defined(EA_PLATFORM_WINDOWS)
+#else
+		internal::vector<path> paths(handle);
+		internal::vector<internal::string> to_check(handle);
+		to_check.emplace_back(p.str(path::path_type::posix_path, handle));
+
+		while (!to_check.empty()) {
+			internal::string str(to_check.back(), handle);
+			path p(str, handle);
+			DIR* dir = opendir(str.c_str());
+			to_check.pop_back();
+
+			if (dir != nullptr) {
+				dirent* entry;
+				while ((entry = readdir(dir))) {
+					if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+						continue;
+					}
+					auto subpath = (p / path(entry->d_name, handle));
+					auto subpath_str = subpath.str(handle);
+					struct stat s {};
+					stat(subpath_str.c_str(), &s);
+					if (S_ISDIR(s.st_mode)) {
+						to_check.emplace_back(std::move(subpath_str), handle);
+					}
+					paths.emplace_back(std::move(subpath));
+				}
+			}
+		}
+
+		return paths;
+#endif
+	}
+
 	bool remove_directory(path const& p, bvestl::polyalloc::allocator_handle const handle) {
 #if defined(EA_PLATFORM_WINDOWS)
 		return RemoveDirectoryW(p.wstr(handle).c_str()) != 0;
 #else
 		if (rmdir(p.str(handle).c_str())) {
+			// TODO: Error checking
 			return false;
 		}
 		return true;
@@ -346,4 +404,5 @@ namespace bvestl::fs {
 		return true;
 #endif
 	}
+
 } // namespace bvestl::fs

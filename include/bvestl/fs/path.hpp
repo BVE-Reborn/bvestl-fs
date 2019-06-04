@@ -141,14 +141,32 @@ namespace bvestl::fs {
 	// Utility
 	BVESTL_FS_EXPORT path cwd(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 
-	BVESTL_FS_EXPORT bool create_directory(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
-	BVESTL_FS_EXPORT bool create_directory_recursive(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
-	BVESTL_FS_EXPORT bool remove_directory(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
-	BVESTL_FS_EXPORT bool remove_directory_recursive(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
-	BVESTL_FS_EXPORT bool remove_file(const path& p, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
-	BVESTL_FS_EXPORT bool resize_file(const path& p,
-	                                  size_t target_length,
-	                                  bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT bool create_directory(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT bool create_directory_recursive(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+
+	BVESTL_FS_EXPORT internal::vector<path> list_directory(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT internal::vector<path> list_directory_recursive(const path& p,
+	                                                                 polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+
+	using TraverseFunc = void(const path& p, void* data, polyalloc::allocator_handle handle);
+	BVESTL_FS_EXPORT bool traverse_directory(const path& p,
+	                                         TraverseFunc* func,
+	                                         void* data,
+	                                         polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+
+	template <class F>
+	EA_FORCE_INLINE bool traverse_directory(const path& p, F& func, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) {
+		auto lambda = [](const path& p, void* data, polyalloc::allocator_handle handle_in) -> bool {
+			return (*static_cast<F*>(data))(p, handle_in);
+		};
+		return traverse_directory(p, lambda, &func, handle);
+	}
+
+	BVESTL_FS_EXPORT bool remove_directory(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT bool remove_directory_recursive(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+
+	BVESTL_FS_EXPORT bool remove_file(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT bool resize_file(const path& p, size_t target_length, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 
 	// Printing
 	BVESTL_FS_EXPORT std::ostream& operator<<(std::ostream& os, const path& path);

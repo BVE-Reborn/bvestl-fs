@@ -11,7 +11,25 @@ std::ostream& operator<<(std::ostream& os, bvestl::fs::internal::string str) {
 	return os;
 }
 
-bvestl::fs::internal::string* root;
+bvestl::fs::path* root;
+
+class FileSystemTestFixture {
+public:
+	FileSystemTestFixture() {
+		bvestl::fs::create_directory_recursive(*root);
+	}
+	~FileSystemTestFixture() {
+		bvestl::fs::remove_directory_recursive(*root);
+	}
+};
+
+TEST_CASE_FIXTURE(FileSystemTestFixture, "List Directory") {
+	auto result = bvestl::fs::list_directory_recursive(root->parent_path());
+
+	for(auto& p : result) {
+		 std::cout << p.str() << '\n';
+	}
+}
 
 int main(int const argc, char** argv) {
 	doctest::Context context(argc, argv);
@@ -39,13 +57,12 @@ int main(int const argc, char** argv) {
 		return 1;
 	}
 
-	root = &root_item;
-
-	bvestl::fs::create_directory_recursive(bvestl::fs::path(*root));
+	bvestl::fs::path root_path(root_item);
+	bvestl::fs::create_directory_recursive(root_path);
+	root_path = root_path.make_absolute();
+	root = &root_path;
 
 	int const res = context.run(); // run
-
-	bvestl::fs::remove_directory_recursive(bvestl::fs::path(*root));
 
 	if (context.shouldExit()) // important - query flags (and --exit) rely on the user doing this
 		return res;           // propagate the result of the tests
