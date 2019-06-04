@@ -41,9 +41,7 @@ namespace bvestl::fs {
 
 		// Constructors
 		explicit path(bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
-		    m_path(handle),
-		    m_type(path_type::native_path),
-		    m_absolute(false) {}
+		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {}
 
 		path(const path& path) = default;
 		path(path&& path) = default;
@@ -51,30 +49,22 @@ namespace bvestl::fs {
 		path& operator=(path&& path) = default;
 
 		explicit path(const char* string, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
-		    m_path(handle),
-		    m_type(path_type::native_path),
-		    m_absolute(false) {
+		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(internal::string(string, handle), path_type::native_path, handle);
 		}
 		explicit path(const internal::string& string, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
-		    m_path(handle),
-		    m_type(path_type::native_path),
-		    m_absolute(false) {
+		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(string, path_type::native_path, handle);
 		}
 
 		// Windows Constructors impl
 #if defined(EA_PLATFORM_WINDOWS)
 		path(const wchar_t* wstring, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
-		    m_path(handle),
-		    m_type(path_type::native_path),
-		    m_absolute(false) {
+		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(internal::wstring(wstring, handle), handle);
 		}
 		path(const internal::wstring& wstring, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
-		    m_path(handle),
-		    m_type(path_type::native_path),
-		    m_absolute(false) {
+		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(wstring, handle);
 		}
 

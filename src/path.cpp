@@ -28,25 +28,25 @@
 #include <stdexcept>
 
 void bvestl::fs::path::set(internal::string const& str, path_type const type, bvestl::polyalloc::allocator_handle const handle) {
-    m_type = type;
-    if (type == path_type::windows_path) {
-        internal::string tmp(str, handle);
+	m_type = type;
+	if (type == path_type::windows_path) {
+		internal::string tmp(str, handle);
 
-        // Long windows paths (sometimes) begin with the prefix \\?\. It should only
-        // be used when the path is >MAX_PATH characters long, so we remove it
-        // for convenience and add it back (if necessary) in str()/wstr().
-        static const internal::string PREFIX(R"(\\?\)", get_global_allocator());
-        if (tmp.length() >= PREFIX.length()
-            && std::mismatch(std::begin(PREFIX), std::end(PREFIX), std::begin(tmp)).first == std::end(PREFIX)) {
-            tmp.erase(0, 4);
-        }
-        m_path = tokenize(tmp, internal::string("/\\", handle), m_path.get_allocator());
-        m_absolute = tmp.size() >= 2 && std::isalpha(tmp[0]) && tmp[1] == ':';
-    }
-    else {
-        m_path = tokenize(str, internal::string("/", handle), m_path.get_allocator());
-        m_absolute = !str.empty() && str[0] == '/';
-    }
+		// Long windows paths (sometimes) begin with the prefix \\?\. It should only
+		// be used when the path is >MAX_PATH characters long, so we remove it
+		// for convenience and add it back (if necessary) in str()/wstr().
+		static const internal::string PREFIX(R"(\\?\)", get_global_allocator());
+		if (tmp.length() >= PREFIX.length()
+		    && std::mismatch(std::begin(PREFIX), std::end(PREFIX), std::begin(tmp)).first == std::end(PREFIX)) {
+			tmp.erase(0, 4);
+		}
+		m_path = tokenize(tmp, internal::string("/\\", handle), m_path.get_allocator());
+		m_absolute = tmp.size() >= 2 && std::isalpha(tmp[0]) && tmp[1] == ':';
+	}
+	else {
+		m_path = tokenize(str, internal::string("/", handle), m_path.get_allocator());
+		m_absolute = !str.empty() && str[0] == '/';
+	}
 }
 
 #if defined(EA_PLATFORM_WINDOWS)
@@ -62,40 +62,40 @@ void bvestl::fs::path::set(const internal::wstring& wstring, path_type const typ
 #endif
 
 bvestl::fs::internal::string bvestl::fs::path::str(path_type const type, bvestl::polyalloc::allocator_handle const handle) const {
-    internal::string out_str(handle);
+	internal::string out_str(handle);
 
-    if (m_absolute) {
-        if (m_type == path_type::posix_path)
-            out_str += '/';
-        else {
-            size_t length = 0;
-            for (const auto& i : m_path) {
-                // No special case for the last segment to count the NULL character
-                length += i.length() + 1;
-            }
-            // Windows requires a \\?\ prefix to handle paths longer than MAX_PATH
-            // (including their null character). NOTE: relative paths >MAX_PATH are
-            // not supported at all in Windows.
-            if (length > MAX_PATH_WINDOWS_LEGACY) {
-                char header[] = R"(\\?\)";
-                out_str.append(header, eastl::extent<decltype(header)>::value);
-            }
-        }
-    }
+	if (m_absolute) {
+		if (m_type == path_type::posix_path)
+			out_str += '/';
+		else {
+			size_t length = 0;
+			for (const auto& i : m_path) {
+				// No special case for the last segment to count the NULL character
+				length += i.length() + 1;
+			}
+			// Windows requires a \\?\ prefix to handle paths longer than MAX_PATH
+			// (including their null character). NOTE: relative paths >MAX_PATH are
+			// not supported at all in Windows.
+			if (length > MAX_PATH_WINDOWS_LEGACY) {
+				char header[] = R"(\\?\)";
+				out_str.append(header, eastl::extent<decltype(header)>::value);
+			}
+		}
+	}
 
-    for (size_t i = 0; i < m_path.size(); ++i) {
-        out_str.append(m_path[i]);
-        if (i + 1 < m_path.size()) {
-            if (type == path_type::posix_path) {
-                out_str += '/';
-            }
-            else {
-                out_str += '\\';
-            }
-        }
-    }
+	for (size_t i = 0; i < m_path.size(); ++i) {
+		out_str.append(m_path[i]);
+		if (i + 1 < m_path.size()) {
+			if (type == path_type::posix_path) {
+				out_str += '/';
+			}
+			else {
+				out_str += '\\';
+			}
+		}
+	}
 
-    return out_str;
+	return out_str;
 }
 
 #if defined(EA_PLATFORM_WINDOWS)
@@ -109,65 +109,65 @@ bvestl::fs::internal::wstring bvestl::fs::path::wstr(path_type const type, bvest
 #endif
 
 bvestl::fs::internal::string bvestl::fs::path::filename(bvestl::polyalloc::allocator_handle const handle) const {
-    if (empty())
-        return internal::string(handle);
-    const internal::string& last = m_path[m_path.size() - 1];
-    return internal::string(last, handle);
+	if (empty())
+		return internal::string(handle);
+	const internal::string& last = m_path[m_path.size() - 1];
+	return internal::string(last, handle);
 }
 
 bvestl::fs::internal::string bvestl::fs::path::extension(bvestl::polyalloc::allocator_handle const handle) const {
-    const internal::string& name = filename(handle);
-    size_t const pos = name.find_last_of('.');
-    if (pos == internal::string::npos)
-        return internal::string(handle);
-    return internal::substr(name, pos + 1, handle);
+	const internal::string& name = filename(handle);
+	size_t const pos = name.find_last_of('.');
+	if (pos == internal::string::npos)
+		return internal::string(handle);
+	return internal::substr(name, pos + 1, handle);
 }
 
 size_t bvestl::fs::path::file_size(bvestl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
-    struct _stati64 sb;
+	struct _stati64 sb;
 	if (_wstati64(wstr(handle).c_str(), &sb) != 0)
 		throw std::runtime_error(("path::file_size(): cannot stat file \"" + str(handle) + "\"!").c_str());
 #else
-    struct stat sb {};
-    if (stat(str(path_type::posix_path, handle).c_str(), &sb) != 0)
-        throw std::runtime_error(("path::file_size(): cannot stat file \"" + str(path_type::posix_path, handle) + "\"!").c_str());
+	struct stat sb {};
+	if (stat(str(path_type::posix_path, handle).c_str(), &sb) != 0)
+		throw std::runtime_error(("path::file_size(): cannot stat file \"" + str(path_type::posix_path, handle) + "\"!").c_str());
 #endif
-    return static_cast<size_t>(sb.st_size);
+	return static_cast<size_t>(sb.st_size);
 }
 
 bool bvestl::fs::path::file_exists(bvestl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
-    return GetFileAttributesW(wstr(handle).c_str()) != INVALID_FILE_ATTRIBUTES;
+	return GetFileAttributesW(wstr(handle).c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
-    struct stat sb {};
-    return stat(str(path_type::posix_path, handle).c_str(), &sb) == 0;
+	struct stat sb {};
+	return stat(str(path_type::posix_path, handle).c_str(), &sb) == 0;
 #endif
 }
 
 bool bvestl::fs::path::is_directory(bvestl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
-    DWORD const result = GetFileAttributesW(wstr(handle).c_str());
+	DWORD const result = GetFileAttributesW(wstr(handle).c_str());
 	if (result == INVALID_FILE_ATTRIBUTES)
 		return false;
 	return (result & FILE_ATTRIBUTE_DIRECTORY) != 0;
 #else
-    struct stat sb {};
-    if (stat(str(path_type::posix_path, handle).c_str(), &sb))
-        return false;
-    return S_ISDIR(sb.st_mode);
+	struct stat sb {};
+	if (stat(str(path_type::posix_path, handle).c_str(), &sb))
+		return false;
+	return S_ISDIR(sb.st_mode);
 #endif
 }
 
 bool bvestl::fs::path::is_file(bvestl::polyalloc::allocator_handle const handle) const {
 #if defined(_WIN32)
-    DWORD const attr = GetFileAttributesW(wstr(handle).c_str());
+	DWORD const attr = GetFileAttributesW(wstr(handle).c_str());
 	return (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
-    struct stat sb {};
-    if (stat(str(path_type::posix_path, handle).c_str(), &sb))
-        return false;
-    return S_ISREG(sb.st_mode);
+	struct stat sb {};
+	if (stat(str(path_type::posix_path, handle).c_str(), &sb))
+		return false;
+	return S_ISREG(sb.st_mode);
 #endif
 }
 
@@ -225,30 +225,30 @@ std::ostream& bvestl::fs::operator<<(std::ostream& os, path const& path) {
 bvestl::fs::internal::vector<bvestl::fs::internal::string> bvestl::fs::path::tokenize(const internal::string& string,
                                                                                       const internal::string& deliminator,
                                                                                       bvestl::polyalloc::allocator_handle const handle) {
-    internal::string::size_type lastPos = 0, pos = string.find_first_of(deliminator, lastPos);
-    internal::vector<internal::string> tokens(handle);
+	internal::string::size_type lastPos = 0, pos = string.find_first_of(deliminator, lastPos);
+	internal::vector<internal::string> tokens(handle);
 
-    while (lastPos != internal::string::npos) {
-        if (pos != lastPos) {
-            tokens.push_back(internal::substr(string, lastPos, eastl::min(string.size() - lastPos, pos - lastPos), handle));
-        }
-        lastPos = pos;
-        if (lastPos == internal::string::npos || lastPos + 1 == string.length())
-            break;
-        pos = string.find_first_of(deliminator, ++lastPos);
-    }
+	while (lastPos != internal::string::npos) {
+		if (pos != lastPos) {
+			tokens.push_back(internal::substr(string, lastPos, eastl::min(string.size() - lastPos, pos - lastPos), handle));
+		}
+		lastPos = pos;
+		if (lastPos == internal::string::npos || lastPos + 1 == string.length())
+			break;
+		pos = string.find_first_of(deliminator, ++lastPos);
+	}
 
-    return tokens;
+	return tokens;
 }
 
 bvestl::fs::path bvestl::fs::cwd(bvestl::polyalloc::allocator_handle const handle) {
 #if !defined(_WIN32)
-    char temp[PATH_MAX];
-    if (::getcwd(temp, PATH_MAX) == nullptr)
-        throw std::runtime_error("Internal error in getcwd(): " + std::string(strerror(errno)));
-    return path(temp, handle);
+	char temp[PATH_MAX];
+	if (::getcwd(temp, PATH_MAX) == nullptr)
+		throw std::runtime_error("Internal error in getcwd(): " + std::string(strerror(errno)));
+	return path(temp, handle);
 #else
-    internal::wstring temp(path::MAX_PATH_WINDOWS, '\0', handle);
+	internal::wstring temp(path::MAX_PATH_WINDOWS, '\0', handle);
 	if (!_wgetcwd(&temp[0], path::MAX_PATH_WINDOWS))
 		throw std::runtime_error("Internal error in getcwd(): " + std::to_string(GetLastError()));
 	return path(temp, handle);
@@ -285,33 +285,33 @@ bool bvestl::fs::create_directory_recursive(path const& p, bvestl::polyalloc::al
 
 bool bvestl::fs::remove_directory(path const& p, bvestl::polyalloc::allocator_handle const handle) {
 #if defined(EA_PLATFORM_WINDOWS)
-    return RemoveDirectoryW(p.wstr(handle).c_str()) != 0;
+	return RemoveDirectoryW(p.wstr(handle).c_str()) != 0;
 #else
-    if (rmdir(p.str(handle).c_str())) {
-        return false;
-    }
-    return true;
+	if (rmdir(p.str(handle).c_str())) {
+		return false;
+	}
+	return true;
 #endif
 }
 
 bool bvestl::fs::remove_directory_recursive(path const& p, bvestl::polyalloc::allocator_handle const handle) {
 #if defined(EA_PLATFORM_WINDOWS)
-    internal::wstring copy(p.wstr(handle), handle);
+	internal::wstring copy(p.wstr(handle), handle);
 	copy.push_back('\0');
 
 	SHFILEOPSTRUCTW file_op{nullptr, FO_DELETE, copy.c_str(), L"", FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT, false, nullptr, L""};
 	int const ret = SHFileOperationW(&file_op);
 	return ret == 0;
 #else
-    auto rem_func = [](const char* f_path, const struct stat* /*stat_buffer*/, int /*typeflag*/, struct FTW * /*ftwbuf*/) -> int {
-        return remove(f_path);
-    };
+	auto rem_func = [](const char* f_path, const struct stat* /*stat_buffer*/, int /*typeflag*/, struct FTW * /*ftwbuf*/) -> int {
+		return remove(f_path);
+	};
 
-    if (nftw(p.str(handle).c_str(), rem_func, 128, FTW_DEPTH)) {
-        // TODO: Error checking
-        return false;
-    }
-    return true;
+	if (nftw(p.str(handle).c_str(), rem_func, 128, FTW_DEPTH)) {
+		// TODO: Error checking
+		return false;
+	}
+	return true;
 #endif
 }
 
