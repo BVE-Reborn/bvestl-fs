@@ -25,6 +25,7 @@ AlignEscapedNewlines: Left
 CommentPragmas: '^(\\.+)|( NOLINT(NEXTLINE)?)'
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 FixNamespaceComments: true
+IncludeBlocks: Preserve
 IndentCaseLabels: true
 IndentPPDirectives: AfterHash
 IndentWidth: 4
@@ -36,6 +37,7 @@ PenaltyBreakComment: 150
 PenaltyBreakString: 150
 PenaltyReturnTypeOnItsOwnLine: 10000
 PointerAlignment: Left
+SortIncludes: true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
 SpaceBeforeParens: ControlStatements
