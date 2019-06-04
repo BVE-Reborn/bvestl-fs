@@ -40,7 +40,7 @@ namespace bvestl::fs {
 		};
 
 		// Constructors
-		explicit path(bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
+		explicit path(polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
 		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {}
 
 		path(const path& path) = default;
@@ -48,22 +48,22 @@ namespace bvestl::fs {
 		path& operator=(const path& path) = default;
 		path& operator=(path&& path) = default;
 
-		explicit path(const char* string, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
+		explicit path(const char* string, polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
 		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(internal::string(string, handle), path_type::native_path, handle);
 		}
-		explicit path(const internal::string& string, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
+		explicit path(const internal::string& string, polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
 		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(string, path_type::native_path, handle);
 		}
 
 		// Windows Constructors impl
 #if defined(EA_PLATFORM_WINDOWS)
-		path(const wchar_t* wstring, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
+		path(const wchar_t* wstring, polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
 		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(internal::wstring(wstring, handle), handle);
 		}
-		path(const internal::wstring& wstring, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
+		path(const internal::wstring& wstring, polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) :
 		    m_path(handle), m_type(path_type::native_path), m_absolute(false) {
 			set(wstring, handle);
 		}
@@ -75,43 +75,43 @@ namespace bvestl::fs {
 #endif
 
 		// Internal set-from string functions
-		EA_FORCE_INLINE void set(internal::string const& str, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) {
+		EA_FORCE_INLINE void set(internal::string const& str, polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) {
 			set(str, path_type::native_path, handle);
 		}
-		void set(internal::string const& str, path_type type, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+		void set(internal::string const& str, path_type type, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 #if defined(EA_PLATFORM_WINDOWS)
-		void set(const internal::wstring& wstring, bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) {
+		void set(const internal::wstring& wstring, polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) {
 			return set(wstring, path_type::native_path, handle);
 		}
-		void set(const internal::wstring& wstring, path_type type, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+		void set(const internal::wstring& wstring, path_type type, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 #endif
 
 		// Get-string functions
-		EA_FORCE_INLINE internal::string str(bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) const {
+		EA_FORCE_INLINE internal::string str(polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) const {
 			return str(path_type::native_path, handle);
 		}
-		internal::string str(path_type type, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		internal::string str(path_type type, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
 #if defined(EA_PLATFORM_WINDOWS)
-		EA_FORCE_INLINE internal::wstring wstr(bvestl::polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) const {
+		EA_FORCE_INLINE internal::wstring wstr(polyalloc::allocator_handle const handle BVESTL_FS_GET_GLOBAL_ALLOC) const {
 			return wstr(path_type::native_path, handle);
 		}
-		internal::wstring wstr(path_type type, bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		internal::wstring wstr(path_type type, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
 #endif
 
 		bool empty() const { return m_path.empty(); }
 		size_t length() const { return m_path.size(); }
-		internal::string filename(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
-		internal::string extension(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		internal::string filename(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		internal::string extension(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
 
-		size_t file_size(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
-		bool file_exists(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		size_t file_size(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		bool file_exists(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
 
 		bool is_absolute() const { return m_absolute; }
-		bool is_directory(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
-		bool is_file(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		bool is_directory(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		bool is_file(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
 
-		path make_absolute(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
-		path parent_path(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		path make_absolute(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
+		path parent_path(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC) const;
 
 		// Comparison Operators
 		bool operator==(const path& p) const { return p.m_path == m_path; }
@@ -131,7 +131,7 @@ namespace bvestl::fs {
 	  protected:
 		static internal::vector<internal::string> tokenize(const internal::string& string,
 		                                                   const internal::string& deliminator,
-		                                                   bvestl::polyalloc::allocator_handle handle);
+		                                                   polyalloc::allocator_handle handle);
 
 		internal::vector<internal::string> m_path;
 		path_type m_type;
@@ -139,7 +139,7 @@ namespace bvestl::fs {
 	};
 
 	// Utility
-	BVESTL_FS_EXPORT path cwd(bvestl::polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
+	BVESTL_FS_EXPORT path cwd(polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 
 	BVESTL_FS_EXPORT bool create_directory(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
 	BVESTL_FS_EXPORT bool create_directory_recursive(const path& p, polyalloc::allocator_handle handle BVESTL_FS_GET_GLOBAL_ALLOC);
