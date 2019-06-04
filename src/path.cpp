@@ -125,7 +125,7 @@ namespace bvestl::fs {
 	}
 
 	size_t path::file_size(bvestl::polyalloc::allocator_handle const handle) const {
-#if defined(_WIN32)
+#if defined(EA_PLATFORM_WINDOWS)
 		struct _stati64 sb;
 		if (_wstati64(wstr(handle).c_str(), &sb) != 0)
 			throw std::runtime_error(("path::file_size(): cannot stat file \"" + str(handle) + "\"!").c_str());
@@ -138,7 +138,7 @@ namespace bvestl::fs {
 	}
 
 	bool path::file_exists(bvestl::polyalloc::allocator_handle const handle) const {
-#if defined(_WIN32)
+#if defined(EA_PLATFORM_WINDOWS)
 		return GetFileAttributesW(wstr(handle).c_str()) != INVALID_FILE_ATTRIBUTES;
 #else
 		struct stat sb {};
@@ -147,7 +147,7 @@ namespace bvestl::fs {
 	}
 
 	bool path::is_directory(bvestl::polyalloc::allocator_handle const handle) const {
-#if defined(_WIN32)
+#if defined(EA_PLATFORM_WINDOWS)
 		DWORD const result = GetFileAttributesW(wstr(handle).c_str());
 		if (result == INVALID_FILE_ATTRIBUTES)
 			return false;
@@ -161,7 +161,7 @@ namespace bvestl::fs {
 	}
 
 	bool path::is_file(bvestl::polyalloc::allocator_handle const handle) const {
-#if defined(_WIN32)
+#if defined(EA_PLATFORM_WINDOWS)
 		DWORD const attr = GetFileAttributesW(wstr(handle).c_str());
 		return (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
@@ -173,7 +173,7 @@ namespace bvestl::fs {
 	}
 
 	path path::make_absolute(bvestl::polyalloc::allocator_handle const handle) const {
-#if !defined(_WIN32)
+#if !defined(EA_PLATFORM_WINDOWS)
 		char temp[PATH_MAX];
 		if (realpath(str(path_type::posix_path, handle).c_str(), temp) == nullptr)
 			throw std::runtime_error("Internal error in realpath(): " + std::string(strerror(errno)));
@@ -243,7 +243,7 @@ namespace bvestl::fs {
 	}
 
 	path cwd(bvestl::polyalloc::allocator_handle const handle) {
-#if !defined(_WIN32)
+#if !defined(EA_PLATFORM_WINDOWS)
 		char temp[PATH_MAX];
 		if (::getcwd(temp, PATH_MAX) == nullptr)
 			throw std::runtime_error("Internal error in getcwd(): " + std::string(strerror(errno)));
@@ -257,7 +257,7 @@ namespace bvestl::fs {
 	}
 
 	bool create_directory(path const& p, bvestl::polyalloc::allocator_handle const handle) {
-#if defined(_WIN32)
+#if defined(EA_PLATFORM_WINDOWS)
 		return CreateDirectoryW(p.wstr(handle).c_str(), nullptr) != 0;
 #else
 		return mkdir(p.str(path::path_type::posix_path, handle).c_str(), S_IRWXU) == 0;
@@ -265,7 +265,7 @@ namespace bvestl::fs {
 	}
 
 	bool create_directory_recursive(path const& p, bvestl::polyalloc::allocator_handle const handle) {
-#if defined(_WIN32)
+#if defined(EA_PLATFORM_WINDOWS)
 		return SHCreateDirectory(nullptr, p.make_absolute(handle).wstr(handle).c_str()) == ERROR_SUCCESS;
 #else
 		if (create_directory(path(p.str(path::path_type::posix_path, handle).c_str(), handle), handle))
@@ -318,7 +318,7 @@ namespace bvestl::fs {
 	}
 
 	bool remove_file(const path& p, bvestl::polyalloc::allocator_handle const handle) {
-#if !defined(_WIN32)
+#if !defined(EA_PLATFORM_WINDOWS)
 		return std::remove(p.str(path::path_type::posix_path, handle).c_str()) == 0;
 #else
 		return DeleteFileW(p.wstr(handle).c_str()) != 0;
@@ -326,7 +326,7 @@ namespace bvestl::fs {
 	}
 
 	bool resize_file(const path& p, size_t const target_length, bvestl::polyalloc::allocator_handle const handle) {
-#if !defined(_WIN32)
+#if !defined(EA_PLATFORM_WINDOWS)
 		return ::truncate(p.str(path::path_type::posix_path, handle).c_str(), (off_t) target_length) == 0;
 #else
 		HANDLE const file_handle = CreateFileW(p.wstr(handle).c_str(), GENERIC_WRITE, 0, nullptr, 0, FILE_ATTRIBUTE_NORMAL, nullptr);
